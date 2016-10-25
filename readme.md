@@ -29,7 +29,7 @@ can be reused with the bundler with very little additional work.
 ## how does this project work
 
 typescript-bundle layers the typescript cli (tsc), and internally 
-sets the compiler options ```--target AMD``` and ```--outFile```. This causes the 
+sets the compiler options ```--module AMD``` and ```--outFile```. This causes the 
 compiler to emit a single AMD module bundle. typescript-bundle wraps this output 
 with a small shim that bootstraps the modules within, allowing it to be comsumed 
 in page.
