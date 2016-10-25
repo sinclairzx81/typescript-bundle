@@ -10,9 +10,11 @@ npm install typescript -g
 npm install typescript-bundle -g 
 ```
 ## usage
+
 ```
-tsc-bundle input.ts output.js --globalNamespace mylib
+tsc-bundle mylib.ts bundle.js --globalNamespace mylib
 ```
+
 ## overview
 
 typescript-bundle compiles typescript projects that use import / export into a single 
@@ -25,6 +27,16 @@ compiler options, including the watch option. typescript-bundle does however int
 
 Additionally, typescript-bundle also allows for configuration via tsconfig.json, meaning existing project configurations 
 can be reused with the bundler with very little additional work.
+
+## building the project
+The project can be built by running the following command from the project root.
+```
+node tasks build
+```
+to npm install from a local clone use.
+```
+node tasks install
+```
 
 ## how does this project work
 
@@ -39,7 +51,7 @@ in page.
 typescript-bundle's cli works slightly different to tsc. The command line interface is as follows.
 
 ```
-tsc-bundle [input.ts] [output.js] [...options]
+tsc-bundle [input.ts] [bundle.js] [...options]
 ```
 note the following:
 
@@ -49,7 +61,7 @@ be a top level module that imports the other modules used in compilation.
 omitted, the bundled module is contained within a function closure.
 * only the input.ts exports are publically accessable to the html script. All other modules are
 private and inaccesable to the page.
-* the output.ts file supplied at the command line is internally rewritten
+* the output.js file supplied at the command line is internally rewritten
  to be the ```--outFile``` for the typescript compiler. Passing ```--outFile``` has no effect.
 * the ```--module``` option is ignored. typescript-bundle internally defaults to AMD.
 
