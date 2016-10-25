@@ -42,7 +42,8 @@ import {Bundler}                  from "./bundler"
 //-------------------------------------------
 let pathing   = new Pathing()
 let log       = new ConsoleLog()
-let compiler  = new TypeScriptCompiler(new Shell(log))
+let shell     = new Shell(log)
+let compiler  = new TypeScriptCompiler(shell, log)
 let shim      = new TypeScriptAmdOutFileShim()
 let provision = new Provision()
 let bundler   = new Bundler (
@@ -55,9 +56,7 @@ let bundler   = new Bundler (
 //-------------------------------------------
 // bundle !
 //-------------------------------------------
-let options = new Options(process.argv, pathing)
-bundler.bundle(options).then(() => {
-  console.log("tsc-bundle: complete")
-}).catch(error => {
+let options = new Options(process.argv)
+bundler.bundle(options).then(() => {}).catch(error => {
   console.log("tsc-bundle:", error)
 })

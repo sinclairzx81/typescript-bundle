@@ -80,17 +80,11 @@ export class TypeScriptAmdOutFileShim implements Shim {
      * @returns {void}
      */
     public shim(filename: string, ns: string | undefined): void {
-
         let input = fs.readFileSync(filename, "utf8")
-
         if (input.indexOf(this.pre(ns)) === -1) {
-
             input = input.split("\n").map(line => "  " + line).join("\n")
-
             let output = [this.pre(ns), input, this.post()].join('\n')
-
             fs.truncateSync(filename, 0)
-
             fs.writeFileSync(filename, output, "utf8")
         }
     }

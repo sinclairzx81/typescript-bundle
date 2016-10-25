@@ -35,10 +35,19 @@ import { Shell }     from "./shell"
 import { Shim }      from "./shim"
 import { Log }       from "./logger"
 
-export interface BundlerContext {
-  compilerString : string
-  output         : string
-}
+const help_string = `
+
+typescript-bundle:
+
+usage:
+
+ tsc-bundle [input] [output] [...options]
+
+example:
+
+ tsc-bundle ./input.ts ./scripts/bundle.js --gns mylib --target es5
+ 
+`
 
 /**
  * Bundler:
@@ -70,10 +79,21 @@ export class Bundler {
    * @returns {Promise<{}>}
    */
   public bundle(options: Options): Promise<{}> {
-
     return new Promise<{}>((resolve, reject) => {
-
       let opts = options.getCompilerOptions()
+
+      //-------------------------------------------
+      // inspect options for --help.
+      //-------------------------------------------
+      if(opts.help) {
+        this.compiler
+            .compile(options.getCompilerString())
+            .then(() => {
+              this.log.write(help_string)
+              resolve()
+            }).catch(reject)
+        return
+      }
 
       //-------------------------------------------
       // provision output file to watch.
@@ -86,7 +106,6 @@ export class Bundler {
       //-------------------------------------------
 
       let watcher = new Watcher(opts.outFile)
-
       watcher.on("change", () => this.shim.shim(opts.outFile, opts.globalNamespace))
       
       //-----------------------------------------
@@ -94,22 +113,13 @@ export class Bundler {
       // compiler process has ended, we attempt
       // to write the shim over the top.
       //-----------------------------------------
-      let compilerString = options.getCompilerString()
-      
-      this.compiler.compile(compilerString).then(() => {
-
+      this.compiler.compile(options.getCompilerString()).then(() => {
         this.shim.shim(opts.outFile, opts.globalNamespace)
-        
         watcher.dispose()
-        
         resolve()
-        
       }).catch(error => {
-        
         this.shim.shim(opts.outFile, opts.globalNamespace)
-        
         watcher.dispose()
-        
         reject(error)
       })
     })

@@ -48,7 +48,7 @@ export class TypeScriptCompiler implements Compiler {
    * @param {Log} the output log object.
    * @returns {Compiler}
    */
-  constructor(private shell: Shell) { }
+  constructor(private shell: Shell, private log: Log) { }
   
   /**
    * kicks off the compiler with the given command.
@@ -56,7 +56,7 @@ export class TypeScriptCompiler implements Compiler {
    * @returns {Promise<{}>}
    */
   public compile(command: string): Promise<{}> {
-    console.log("compiling: " + command)
+    this.log.write(`\x1b[33m${command}\n\x1b[0m`)
     return new Promise<{}>((resolve, reject) => {
       this.shell.execute(command, 0).then(() => {
         resolve({})
