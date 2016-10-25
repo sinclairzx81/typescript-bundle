@@ -1,0 +1,24 @@
+{
+  "name": "typescript-bundle",
+  "version": "0.7.0",
+  "description": "compiles modular typescript projects into bundle consumable with a html script tag.",
+  "main": "./index.js",
+  "scripts": {
+  },
+  "bin": {
+    "tsc-bundle": "./tsc-bundle"
+  },
+  "preferGlobal": true,
+  "keywords": [
+    "typescript",
+    "amd",
+    "outfile",
+    "bundle"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sinclairzx81/typescript-bundle"
+  },
+  "author": "sinclairzx81",
+  "license": "MIT"
+}
