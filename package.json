@@ -1,6 +1,6 @@
 {
   "name": "typescript-bundle",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "description": "compiles modular typescript projects into bundle consumable with a html script tag.",
   "main": "./index.js",
   "scripts": {

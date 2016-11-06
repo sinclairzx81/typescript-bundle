@@ -83,6 +83,7 @@ export interface CompilerOptions {
   reactNamespace?                   : string
   removeComments?                   : boolean
   rootDir?                          : string
+  rootDirs?                         : string[]
   skipLibCheck?                     : boolean
   skipDefaultLibCheck?              : boolean
   sourceMap?                        : boolean
@@ -154,78 +155,83 @@ export class Options {
       while (args.length > 0) {
         let current = args.shift()
         switch (current) {
-          case "--allowJs":                           options.allowJs = true;  break;
-          case "--allowSyntheticDefaultImports":      options.allowSyntheticDefaultImports = true; break;
-          case "--allowUnreachableCode":              options.allowUnreachableCode = true; break;
-          case "--allowUnusedLabels":                 options.allowUnusedLabels = true; break;
-          case "--baseUrl":                           options.baseUrl = args.shift(); break;
-          case "--charset":                           options.charset = args.shift(); break;
+          case "--allowJs":                           options.allowJs                          = true; break;
+          case "--allowSyntheticDefaultImports":      options.allowSyntheticDefaultImports     = true; break;
+          case "--allowUnreachableCode":              options.allowUnreachableCode             = true; break;
+          case "--allowUnusedLabels":                 options.allowUnusedLabels                = true; break;
+          case "--baseUrl":                           options.baseUrl                          = args.shift(); break;
+          case "--charset":                           options.charset                          = args.shift(); break;
           case "-d":
-          case "--declaration":                       options.declaration = true; break;
-          case "--declarationDir":                    options.declarationDir = args.shift(); break;
-          case "--diagnostics":                       options.diagnostics = true; break;
-          case "--disableSizeLimit":                  options.disableSizeLimit = true; break;
-          case "--emitBOM":                           options.emitBOM = true;  break;
-          case "--emitDecoratorMetadata":             options.emitDecoratorMetadata = true; break;
-          case "--experimentalDecorators":            options.experimentalDecorators = true;  break;
+          case "--declaration":                       options.declaration                      = true; break;
+          case "--declarationDir":                    options.declarationDir                   = args.shift(); break;
+          case "--diagnostics":                       options.diagnostics                      = true; break;
+          case "--disableSizeLimit":                  options.disableSizeLimit                 = true; break;
+          case "--emitBOM":                           options.emitBOM                          = true; break;
+          case "--emitDecoratorMetadata":             options.emitDecoratorMetadata            = true; break;
+          case "--experimentalDecorators":            options.experimentalDecorators           = true; break;
           case "--forceConsistentCasingInFileNames":  options.forceConsistentCasingInFileNames = true; break;
           case "-gns":
-          case "--globalNamespace":                   options.globalNamespace = args.shift(); break;
-          case "--inlineSourceMap":                   options.inlineSourceMap = true; break;
-          case "--inlineSources":                     options.inlineSources = true; break;
-          case "--isolatedModules":                   options.isolatedModules = true; break;
+          case "--globalNamespace":                   options.globalNamespace                  = args.shift(); break;
+          case "--inlineSourceMap":                   options.inlineSourceMap                  = true; break;
+          case "--inlineSources":                     options.inlineSources                    = true; break;
+          case "--isolatedModules":                   options.isolatedModules                  = true; break;
           case "-h":
-          case "--help":                              options.help = true; break;
-          case "--jsx":                               options.jsx = args.shift(); break;
-          case "--lib":                               options.lib = args.shift().split(","); break;
-          case "--listEmittedFiles":                  options.listEmittedFiles = true; break;
-          case "--listFiles":                         options.listFiles = true; break;
-          case "--locale":                            options.locale = args.shift(); break;
-          case "--mapRoot":                           options.mapRoot = args.shift(); break;
-          case "--maxNodeModuleJsDepth":              options.maxNodeModuleJsDepth = parseInt(args.shift()); break;
-          case "--module":                            options.module = args.shift(); break;
-          case "--moduleResolution":                  options.moduleResolution = args.shift(); break;
-          case "--newLine":                           options.newLine = args.shift();  break;
-          case "--noEmit":                            options.noEmit = true; break;
-          case "--noEmitHelpers":                     options.noEmitHelpers = true; break;
-          case "--noEmitOnError":                     options.noEmitOnError = true; break;
-          case "--noFallthroughCasesInSwitch":        options.noFallthroughCasesInSwitch = true; break;
-          case "--noImplicitAny":                     options.noImplicitAny = true;  break;
-          case "--noImplicitReturns":                 options.noImplicitReturns = true; break;
-          case "--noImplicitThis":                    options.noImplicitThis = true;  break;
-          case "--noImplicitUseStrict":               options.noImplicitUseStrict = true; break;
-          case "--noLib":                             options.noLib = true;  break;
-          case "--noResolve":                         options.noResolve = true; break;
-          case "--noUnusedLocals":                    options.noUnusedLocals = true; break;
-          case "--noUnusedParameters":                options.noUnusedParameters = true; break;
-          case "--outDir":                            options.outDir = args.shift(); break;
-          case "--outFile":                           options.outFile = args.shift(); break;
-          case "--preserveConstEnums":                options.preserveConstEnums = true; break;
-          case "--pretty":                            options.pretty = true; break;
+          case "--help":                              options.help                             = true; break;
+          case "--jsx":                               options.jsx                              = args.shift(); break;
+          case "--lib":                               options.lib                              = args.shift().split(","); break;
+          case "--listEmittedFiles":                  options.listEmittedFiles                 = true; break;
+          case "--listFiles":                         options.listFiles                        = true; break;
+          case "--locale":                            options.locale                           = args.shift(); break;
+          case "--mapRoot":                           options.mapRoot                          = args.shift(); break;
+          case "--maxNodeModuleJsDepth":              options.maxNodeModuleJsDepth             = parseInt(args.shift()); break;
+          case "--module":                            options.module                           = args.shift(); break;
+          case "--moduleResolution":                  options.moduleResolution                 = args.shift(); break;
+          case "--newLine":                           options.newLine                          = args.shift(); break;
+          case "--noEmit":                            options.noEmit                           = true; break;
+          case "--noEmitHelpers":                     options.noEmitHelpers                    = true; break;
+          case "--noEmitOnError":                     options.noEmitOnError                    = true; break;
+          case "--noFallthroughCasesInSwitch":        options.noFallthroughCasesInSwitch       = true; break;
+          case "--noImplicitAny":                     options.noImplicitAny                    = true; break;
+          case "--noImplicitReturns":                 options.noImplicitReturns                = true; break;
+          case "--noImplicitThis":                    options.noImplicitThis                   = true; break;
+          case "--noImplicitUseStrict":               options.noImplicitUseStrict              = true; break;
+          case "--noLib":                             options.noLib                            = true; break;
+          case "--noResolve":                         options.noResolve                        = true; break;
+          case "--noUnusedLocals":                    options.noUnusedLocals                   = true; break;
+          case "--noUnusedParameters":                options.noUnusedParameters               = true; break;
+          case "--outDir":                            options.outDir                           = args.shift(); break;
+          case "--outFile":                           options.outFile                          = args.shift(); break;
+          case "--preserveConstEnums":                options.preserveConstEnums               = true; break;
+          case "--pretty":                            options.pretty                           = true; break;
           case "-p":
-          case "--project":                           options.project = args.shift(); break;
-          case "--reactNamespace":                    options.reactNamespace = args.shift(); break;
-          case "--removeComments":                    options.removeComments = true; break;
-          case "--rootDir":                           options.rootDir = args.shift(); break;
-          case "--skipLibCheck":                      options.skipLibCheck = true; break;
-          case "--skipDefaultLibCheck":               options.skipDefaultLibCheck = true; break;
-          case "--sourceMap":                         options.sourceMap = true; break;
-          case "--sourceRoot":                        options.sourceRoot = args.shift(); break;
-          case "--stripInternal":                     options.stripInternal = true; break;
-          case "--suppressExcessPropertyErrors":      options.suppressExcessPropertyErrors = true; break;
-          case "--suppressImplicitAnyIndexErrors":    options.suppressImplicitAnyIndexErrors = true; break;
+          case "--project":                           options.project                          = args.shift(); break;
+          case "--reactNamespace":                    options.reactNamespace                   = args.shift(); break;
+          case "--removeComments":                    options.removeComments                   = true; break;
+          case "--rootDir":                           options.rootDir                          = args.shift(); break;
+          case "--rootDirs":                          options.rootDirs                         = args.shift().split(","); break;
+          case "--skipLibCheck":                      options.skipLibCheck                     = true; break;
+          case "--skipDefaultLibCheck":               options.skipDefaultLibCheck              = true; break;
+          case "--sourceMap":                         options.sourceMap                        = true; break;
+          case "--sourceRoot":                        options.sourceRoot                       = args.shift(); break;
+          case "--stripInternal":                     options.stripInternal                    = true; break;
+          case "--suppressExcessPropertyErrors":      options.suppressExcessPropertyErrors     = true; break;
+          case "--suppressImplicitAnyIndexErrors":    options.suppressImplicitAnyIndexErrors   = true; break;
           case "-t":
-          case "--target":                            options.target = args.shift(); break;
+          case "--target":                            options.target                           = args.shift(); break;
+          case "types":                               options.types                            = args.shift().split(","); break;
+          case "typeRoots":                           options.types                            = args.shift().split(","); break;
           case "-v":
-          case "--version":                           options.version = true; break;
+          case "--version":                           options.version                          = true; break;
           case "-w":
-          case "--watch":                             options.watch = true; break;
+          case "--watch":                             options.watch                            = true; break;
           default: return { help: true }
         }
       }
 
       //------------------------------------------------------------
-      // load in tsconfig compiler options if available.
+      // bind in any tsconfig options if not already set. Note,
+      // that we do not set the option if supplied at the command 
+      // line arguments.
       //------------------------------------------------------------
       let tsconfig = this.getTsConfigCompilerOptions(options.project)
       if(tsconfig !== undefined) {
@@ -286,7 +292,7 @@ export class Options {
     if (options.locale)                           buffer.push("--locale "  + options.locale)
     if (options.mapRoot)                          buffer.push("--mapRoot " + options.mapRoot)
     if (options.maxNodeModuleJsDepth)             buffer.push("--maxNodeModuleJsDepth " + options.maxNodeModuleJsDepth.toString())
-    // if(options.module)                           buffer.push("--module " + options.module) 
+    /* ignore if(options.module)                  buffer.push("--module " + options.module) */
     buffer.push("--module amd")
     if (options.moduleResolution)                 buffer.push("--moduleResolution " + options.moduleResolution)
     if (options.newLine)                          buffer.push("--newLine "          + options.newLine)
@@ -302,11 +308,11 @@ export class Options {
     if (options.noResolve)                        buffer.push("--noResolve")
     if (options.noUnusedLocals)                   buffer.push("--noUnusedLocals")
     if (options.noUnusedParameters)               buffer.push("--noUnusedParameters")
-    //if (options.outDir)                           buffer.push("--outDir " + options.outDir)
+    /* ignore if (options.outDir)               buffer.push("--outDir " + options.outDir) */
     if (options.outFile)                          buffer.push("--outFile " + options.outFile)
     if (options.preserveConstEnums)               buffer.push("--preserveConstEnums")
     if (options.pretty)                           buffer.push("--pretty")
-    if (options.reactNamespace)                   buffer.push("--reactNamespace")
+    if (options.reactNamespace)                   buffer.push("--reactNamespace " + options.reactNamespace)
     if (options.removeComments)                   buffer.push("--removeComments")
     if (options.rootDir)                          buffer.push("--rootDir " + options.rootDir)
     if (options.skipLibCheck)                     buffer.push("--skipLibCheck")
@@ -317,8 +323,10 @@ export class Options {
     if (options.stripInternal)                    buffer.push("--stripInternal")
     if (options.suppressExcessPropertyErrors)     buffer.push("--suppressExcessPropertyErrors")
     if (options.suppressImplicitAnyIndexErrors)   buffer.push("--suppressImplicitAnyIndexErrors")
-    if (options.target)                           buffer.push("--target "    + options.target)
+    if (options.target)                           buffer.push("--target " + options.target)
     if (options.traceResolution)                  buffer.push("--traceResolution")
+    if (options.types)                            buffer.push("--types " + options.types.join(","))
+    if (options.typeRoots)                        buffer.push("--types " + options.typeRoots.join(","))
     if (options.version)                          buffer.push("--version")
     if (options.watch)                            buffer.push("--watch")
     return `tsc ${options.inFile} ${buffer.join(' ')}`
