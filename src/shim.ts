@@ -46,29 +46,41 @@ export class TypeScriptAmdOutFileShim implements Shim {
     constructor() { }
 
     private pre = (ns: string) => `${ns !== undefined ? `var ${ns} = ` : ""}(function () {
-  var defs = [];
-  var resolve = function (id, cache) {
-      if (id === "exports")
-          return {};
-      if (cache[id] !== undefined)
-          return cache[id];
-      var def = (defs.some(function (def) { return def.id === id; }))
-          ? defs.filter(function (def) { return def.id === id; })[0]
-          : ({ id: id, deps: [], factory: function () { return require(id); } });
-      var deps = def.deps.map(function (dep) { return resolve(dep, cache); });
-      var exports = def.factory.apply({}, deps);
-      if (def.deps.some(function (dep) { return dep === "exports"; }))
-          exports = deps[def.deps.indexOf("exports")];
-      return cache[id] = exports;
-  };
-  var collect = function () {
-      return resolve(defs[defs.length - 1].id, {
-          "require": function (arg, callback) { return callback(require(arg)); }
-      });
-  };
-  var define = function (id, deps, factory) {
-      return defs.push({ id: id, deps: deps, factory: factory });
-  };\n`
+    var main = null;
+    var modules = {
+        "require": {
+            factory: undefined,
+            dependencies: [],
+            exports: function (args, callback) { return require(args, callback); },
+            resolved: true
+        }
+    };
+    function define(id, dependencies, factory) {
+        return main = modules[id] = {
+            dependencies: dependencies,
+            factory: factory,
+            exports: {},
+            resolved: false
+        };
+    }
+    function resolve(definition) {
+        if (definition.resolved === true)
+            return;
+        definition.resolved = true;
+        var dependencies = definition.dependencies.map(function (id) {
+            return (id === "exports")
+                ? definition.exports
+                : (function () {
+                    resolve(modules[id]);
+                    return modules[id].exports;
+                })();
+        });
+        definition.factory.apply(null, dependencies);
+    }
+    function collect() {
+        Object.keys(modules).map(function (key) { return modules[key]; }).forEach(resolve);
+        return main.exports;
+    }\n`
 
     private post = () => `  return collect(); \n})();`
 
@@ -82,7 +94,7 @@ export class TypeScriptAmdOutFileShim implements Shim {
     public shim(filename: string, ns: string | undefined): void {
         let input = fs.readFileSync(filename, "utf8")
         if (input.indexOf(this.pre(ns)) === -1) {
-            input = input.split("\n").map(line => "  " + line).join("\n")
+            input = input.split("\n").map(line => line.trim()).map(line => "  " + line).join("\n")
             let output = [this.pre(ns), input, this.post()].join('\n')
             fs.truncateSync(filename, 0)
             fs.writeFileSync(filename, output, "utf8")
