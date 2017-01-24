@@ -71,8 +71,10 @@ export class TypeScriptAmdOutFileShim implements Shim {
           return (id === "exports")
               ? definition.exports
               : (function () {
-                  resolve(modules[id]);
-                  return modules[id].exports;
+                  if(modules[id] !== undefined) {
+                    resolve(modules[id]);
+                    return modules[id].exports;
+                  } else return require(id)
               })();
       });
       definition.factory.apply(null, dependencies);
