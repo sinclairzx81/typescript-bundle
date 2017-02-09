@@ -81,7 +81,9 @@ export class TypeScriptAmdOutFileShim implements Shim {
   }
   function collect() {
       Object.keys(modules).map(function (key) { return modules[key]; }).forEach(resolve);
-      return main.exports;
+      return (main !== null) 
+        ? main.exports
+        : undefined
   }\n`
 
     private post = () => `  return collect(); \n})();`
