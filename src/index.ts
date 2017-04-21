@@ -28,7 +28,7 @@ THE SOFTWARE.
 
 /// <reference path="./@types/node/node.d.ts" />
 
-import {Log, ConsoleLog}          from "./logger"
+import {Log, ConsoleLog}          from "./log"
 import {Options}                  from "./options"
 import {Pathing}                  from "./pathing"
 import {Shell}                    from "./shell"

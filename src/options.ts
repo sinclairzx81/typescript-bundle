@@ -38,6 +38,7 @@ export interface CompilerOptions {
   allowSyntheticDefaultImports?     : boolean
   allowUnreachableCode?             : boolean
   allowUnusedLabels?                : boolean
+  alwaysStrict?                     : boolean
   baseUrl?                          : string
   charset?                          : string
   declaration?                      : boolean
@@ -49,11 +50,13 @@ export interface CompilerOptions {
   experimentalDecorators?           : boolean
   forceConsistentCasingInFileNames? : boolean
   globalNamespace?                  : string
+  importHelpers?                    : boolean
   inlineSourceMap?                  : boolean
   inlineSources?                    : boolean
   isolatedModules?                  : boolean
   help?                             : boolean
   jsx?                              : string | "Preserve" | "React"
+  jsxFactory?                       : string
   lib?                              : string[]
   listEmittedFiles?                 : boolean
   listFiles?                        : boolean
@@ -159,6 +162,7 @@ export class Options {
           case "--allowSyntheticDefaultImports":      options.allowSyntheticDefaultImports     = true; break;
           case "--allowUnreachableCode":              options.allowUnreachableCode             = true; break;
           case "--allowUnusedLabels":                 options.allowUnusedLabels                = true; break;
+          case "--alwaysStrict":                      options.alwaysStrict                     = true; break;
           case "--baseUrl":                           options.baseUrl                          = args.shift(); break;
           case "--charset":                           options.charset                          = args.shift(); break;
           case "-d":
@@ -174,10 +178,12 @@ export class Options {
           case "--globalNamespace":                   options.globalNamespace                  = args.shift(); break;
           case "--inlineSourceMap":                   options.inlineSourceMap                  = true; break;
           case "--inlineSources":                     options.inlineSources                    = true; break;
+          case "--importHelpers":                     options.importHelpers                    = true; break;
           case "--isolatedModules":                   options.isolatedModules                  = true; break;
           case "-h":
           case "--help":                              options.help                             = true; break;
           case "--jsx":                               options.jsx                              = args.shift(); break;
+          case "--jsxFactory":                        options.jsxFactory                       = args.shift(); break;
           case "--lib":                               options.lib                              = args.shift().split(","); break;
           case "--listEmittedFiles":                  options.listEmittedFiles                 = true; break;
           case "--listFiles":                         options.listFiles                        = true; break;
@@ -268,6 +274,7 @@ export class Options {
     let options = this.getCompilerOptions()
     if (options.help)                             return "tsc -h"
     if (options.allowJs)                          buffer.push("--allowJs")
+    if (options.alwaysStrict)                     buffer.push("--alwaysStrict")
     if (options.allowSyntheticDefaultImports)     buffer.push("--allowSyntheticDefaultImports")
     if (options.allowUnreachableCode)             buffer.push("--allowUnreachableCode")
     if (options.allowUnusedLabels)                buffer.push("--allowUnusedLabels")
@@ -281,11 +288,13 @@ export class Options {
     if (options.emitDecoratorMetadata)            buffer.push("--emitDecoratorMetadata")
     if (options.experimentalDecorators)           buffer.push("--experimentalDecorators")
     if (options.forceConsistentCasingInFileNames) buffer.push("--forceConsistentCasingInFileNames")
+    if (options.importHelpers)                    buffer.push("--importHelpers")
     if (options.inlineSourceMap)                  buffer.push("--inlineSourceMap")
     if (options.inlineSources)                    buffer.push("--inlineSources")
     if (options.isolatedModules)                  buffer.push("--isolatedModules")
     if (options.help)                             buffer.push("--help")
     if (options.jsx)                              buffer.push("--jsx " + options.jsx)
+    if (options.jsxFactory)                       buffer.push("--jsxFactory " + options.jsxFactory)
     if (options.lib)                              buffer.push("--lib " + options.lib.join(","))
     if (options.listEmittedFiles)                 buffer.push("--listEmittedFiles")
     if (options.listFiles)                        buffer.push("--listFiles")

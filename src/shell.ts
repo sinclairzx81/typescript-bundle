@@ -27,7 +27,7 @@ THE SOFTWARE.
 ---------------------------------------------------------------------------*/
 
 import {spawn}  from "child_process"
-import {Log}    from "./logger"
+import {Log}    from "./log"
 
 /**
  * Shell:

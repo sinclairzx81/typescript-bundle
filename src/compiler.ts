@@ -27,7 +27,7 @@ THE SOFTWARE.
 ---------------------------------------------------------------------------*/
 
 import {Shell}   from "./shell"
-import {Log}     from "./logger"
+import {Log}     from "./log"
 import {Watcher} from "./watcher"
 
 export interface Compiler {

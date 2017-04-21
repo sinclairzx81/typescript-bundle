@@ -33,7 +33,7 @@ import { Watcher }   from "./watcher"
 import { Compiler }  from "./compiler"
 import { Shell }     from "./shell"
 import { Shim }      from "./shim"
-import { Log }       from "./logger"
+import { Log }       from "./log"
 
 const help_string = `
 
