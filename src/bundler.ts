@@ -36,16 +36,15 @@ import { Shim }      from "./shim"
 import { Log }       from "./log"
 
 const help_string = `
-
 typescript-bundle:
 
 usage:
 
- tsc-bundle [input] [output] [...options]
+ tsc-bundle [input] [output] [--globalNamespace] [...standard tsc compiler options]
 
 example:
 
- tsc-bundle ./input.ts ./scripts/bundle.js --gns mylib --target es5
+ tsc-bundle ./input.ts ./scripts/bundle.js --globalNamespace myapp
  
 `
 

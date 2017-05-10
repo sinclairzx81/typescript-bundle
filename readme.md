@@ -1,63 +1,54 @@
 # typescript-bundle
-
+### bundle modular typescript projects for the browser
 ## install
 ```
 npm install typescript -g
 npm install typescript-bundle -g 
 ```
 ## usage
-
+code
+```typescript
+// myapp.ts
+export function helloworld() { ... }
 ```
-tsc-bundle mylib.ts bundle.js --globalNamespace mylib
+compile
+```
+tsc-bundle myapp.ts myapp.js --globalNamespace myapp
+```
+run
+```html
+<script src="./myapp.js">
+   myapp.helloworld()
+</script>
 ```
 
 ## overview
 
-typescript-bundle compiles modular typescript projects that use import / export into a single 
-output script that is directly consumable inside a web page with a simple html &lt;script&gt; 
-tag. 
+typescript-bundle is a small command line utility for compiling modular typescript projects into a single output script that is directly consumable inside a web page with a ```<script>``` tag. 
 
 ## command line options
 
-typescript-bundle's cli works slightly different to tsc. The command line interface is as follows.
+typescript-bundle's cli is similar to the tsc cli except that it expects exactly one input typescript file and emits one output javascript file. 
 
-```
-tsc-bundle input.ts bundle.js [...standard tsc compiler options]
-```
-additionally, typescript-bundle can also inherit the configurations in ```tsconfig.json``` if located
-in the current working directory, otherwise a configuration can be specified with the following.
+> typescript-bundle expects the ```input.ts``` typescript file to ```import``` other files to be included in the compilation, and ```export``` the members that are to be visable to the page.
 
+
+The command line interface is as follows...
+```
+tsc-bundle [input] [output] [--globalNamespace] [...standard tsc compiler options]
+```
+An example of which might look something like...
+```
+tsc-bundle input.ts output.js --globalNamespace myapp --target es2015 --noImplicitAny --watch
+```
+> typescript-bundle supports most of the tsc compiler switches except for ```--module``` and ```--outFile``` which are internally set to ```AMD``` and the given output filename respectively.
+
+> the ```--globalNamespace``` option will expose the given name ```myapp``` to the page when referenced. If omitted, typecript-bundle will simply wrap all compiled modules within a function closure inaccessible to the page.
+
+By default, typescript-bundle will inherit the configurations within a ```tsconfig.json``` if found within the current working directory, otherwise a configuration can be specified with the following.
 ```
 tsc-bundle input.ts bundle.js -p ./settings/tsconfig.json
 ```
-typescript-bundle provides one additional option named ```--globalNamespace``` or ```-gns``` which the
-user can use to specify a global variable to access a modules exported members.
-
-```
-tsc-bundle input.ts bundle.js --globalNamespace mylib
-```
-
-read sections below for more information around this option.
-
-## rational
-
-As of writing (November 2016), the typescript compiler still provides no direct mechanism to compile
-modular typescript source code into something that is directly comsumable in web pages. Current
-best practice encourages that developers should be leveraging import/export to wire their projects, 
-however, without selecting a module loader, or external bundler (such as webpack, browserify), 
-the modules emitted from the compiler just cannot be consumed.
-
-An alternative approach is to use typescripts ```<reference>``` directive. Which does allow script to 
-be concatenated into a single output and be consumed in page, but at the expense of having code 
-not compatible with import / export. 
-
-This project seeks to find a reasonable middle ground, letting developers author their projects using
-import / export, compile that code into something that is directly consumable in page, and allow that 
-code to be easily migrated into a dedicated module system / external bundling technology with 0 need 
-to modify their code base. 
-
-note: this project will be marked deprecated should this functionality arrive in the typescript compiler
-itself.
 
 ## how does this project work
 
