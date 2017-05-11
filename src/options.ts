@@ -224,8 +224,9 @@ export class Options {
           case "--suppressImplicitAnyIndexErrors":    options.suppressImplicitAnyIndexErrors   = true; break;
           case "-t":
           case "--target":                            options.target                           = args.shift(); break;
-          case "types":                               options.types                            = args.shift().split(","); break;
-          case "typeRoots":                           options.types                            = args.shift().split(","); break;
+          case "--traceResolution":                   options.traceResolution                  = true; break;
+          case "--types":                             options.types                            = args.shift().split(","); break;
+          case "--typeRoots":                         options.typeRoots                        = args.shift().split(","); break;
           case "-v":
           case "--version":                           options.version                          = true; break;
           case "-w":
@@ -335,7 +336,7 @@ export class Options {
     if (options.target)                           buffer.push("--target " + options.target)
     if (options.traceResolution)                  buffer.push("--traceResolution")
     if (options.types)                            buffer.push("--types " + options.types.join(","))
-    if (options.typeRoots)                        buffer.push("--types " + options.typeRoots.join(","))
+    if (options.typeRoots)                        buffer.push("--typeRoots " + options.typeRoots.join(","))
     if (options.version)                          buffer.push("--version")
     if (options.watch)                            buffer.push("--watch")
     return `tsc ${options.inFile} ${buffer.join(' ')}`
