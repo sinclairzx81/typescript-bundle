@@ -13,7 +13,7 @@ export function helloworld() { ... }
 ```
 compile
 ```
-tsc-bundle myapp.ts myapp.js --globalNamespace myapp
+tsc-bundle myapp.ts myapp.js --exportAs myapp
 ```
 run
 ```html
@@ -24,31 +24,46 @@ run
 
 ## overview
 
-typescript-bundle is a small command line utility for compiling modular typescript projects into a single output script that is directly consumable inside a web page with a ```<script>``` tag. 
+typescript-bundle is a minimal command line utility for compiling modular typescript projects into a single output script that is consumable inside a web page with a ```<script>``` tag. It directly layers the typescript compiler cli, and allows for multi file modular typescript projects to be written and consumed in a website with no additional tooling. 
+
+typescript-bundle supports the majority of the typescript compiler switches, including compile on save for fast and rapid typescript workflows. 
 
 ## command line options
 
-typescript-bundle's cli is similar to the tsc cli except that it expects exactly one input typescript file and emits one output javascript file. 
+typescript-bundle's cli is similar to the typescipt ```tsc``` cli with the exception that the user must specify 1 input file and 1 output
+file up front. The input file should be the top most module in a given project, and should ```import``` all other modules to be part of a compilation.
 
 > typescript-bundle expects the ```input.ts``` typescript file to ```import``` other files to be included in the compilation, and ```export``` the members that are to be visable to the page.
 
-
 The command line interface is as follows...
 ```
-tsc-bundle [input] [output] [--globalNamespace] [...standard tsc compiler options]
+tsc-bundle [input] [output] [--exportAs] [...standard tsc compiler options]
 ```
 An example of which might look something like...
 ```
-tsc-bundle input.ts output.js --globalNamespace myapp --target es2015 --noImplicitAny --watch
+tsc-bundle input.ts output.js --exportAs myapp --target es2015 --noImplicitAny --watch
 ```
 > typescript-bundle supports most of the tsc compiler switches except for ```--module``` and ```--outFile``` which are internally set to ```AMD``` and the given output filename respectively.
 
-> the ```--globalNamespace``` option will expose the given name ```myapp``` to the page when referenced. If omitted, typecript-bundle will simply wrap all compiled modules within a function closure inaccessible to the page.
+> the ```--exportAs``` option will expose the given name ```myapp``` to the page. If omitted, typecript-bundle will simply wrap all compiled modules within a function closure, with exported modules inaccessible to the page.
 
-By default, typescript-bundle will inherit the configurations within a ```tsconfig.json``` if found within the current working directory, otherwise a configuration can be specified with the following.
+typescript-bundle can also be configured by way of tsconfig.json, with the caveat that the configuration must conform to typescript-bundles internal specification. The minimal basic configuration is as follows. 
+
+```json
+{
+  "compilerOptions": {
+    "module": "amd",
+    "outFile": "output.js",
+  }, "files": [
+    "input.ts"
+  ]
+}
+``` 
+which can be compiled with...
 ```
-tsc-bundle input.ts bundle.js -p ./settings/tsconfig.json
+tsc-bundle --project ./tsconfig.json -exportAs myapp
 ```
+> developers are free to configure all other compiler switches with the exception of ```--moduleResolution``` and ```--outDir``` which must be left undefined.
 
 ## how does this project work
 
@@ -80,7 +95,7 @@ produced by the typescript compiler, and how that rewritten by typescript-bundle
 and should import the other modules you want to include in the compilation.
 - the index.ts is responsible for exporting objects to the page. Only exports on this module are publically accessible, 
 all exported variables in other modules are private. 
-- The exports on index.ts are written to the ```--globalNamespace``` variable name given at the command line. If no global 
+- The exports on index.ts are written to the ```--exportAs``` variable name given at the command line. If no global 
 namespace is given, the modules are wrapped within a closure and inaccessble to the page.
 - typescript-bundle ignores ```--outFile, --outDir and ---module``` compiler options.  Internally, these options are set
 to ```--module amd``` and ```--outFile [bundle.js]``` where bundle.js is provided as the second argument at the command line.

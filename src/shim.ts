@@ -1,10 +1,10 @@
 /*--------------------------------------------------------------------------
 
-typescript-bundle - compiles modular typescript projects into bundle consumable with a html script tag.
+typescript-bundle - bundle modular typescript projects for the browser
 
 The MIT License (MIT)
 
-Copyright (c) 2016 Haydn Paterson (sinclair) <haydn.developer@gmail.com>
+Copyright (c) 2016-2017 Haydn Paterson (sinclair) <haydn.developer@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,24 +28,8 @@ THE SOFTWARE.
 
 import * as fs from "fs"
 
-export interface Shim {
-    shim(filename: string, ns: string)
-}
-
-/**
- * TypeScriptAmdOutFileShim:
- * 
- * Provides a single script shim for the typescript compilers
- * AMD "outfile" option. Relevant to TypeScript v 2.0.3.
- * Note: this shim is highly reliant on the TypeScript 
- * AMD outfile option. If the behaviour and output generated
- * by this option changes, then this shim will cease to work.
- */
-export class TypeScriptAmdOutFileShim implements Shim {
-
-    constructor() { }
-
-    private pre = (ns: string) => `${ns !== undefined ? `var ${ns} = ` : ""}(function () {
+// the amd module shim header.
+const header = (ns: string) => `${ns !== undefined ? `var ${ns} = ` : ""}(function () {
   var main = null;
   var modules = {
       "require": {
@@ -86,22 +70,51 @@ export class TypeScriptAmdOutFileShim implements Shim {
         : undefined
   }\n`
 
-    private post = () => `  return collect(); \n})();`
+// the amd module shim footer.
+const footer = () => `  return collect(); \n})();`
 
-    /**
-     * for the given filename and namespace, shim the file. If the
-     * file has already been shimmed, no action is taken.
-     * @param {string} the file to shim.
-     * @param {string | undefined} namespace to emit.
-     * @returns {void}
-     */
-    public shim(filename: string, ns: string | undefined): void {
-        let input = fs.readFileSync(filename, "utf8")
-        if (input.indexOf(this.pre(ns)) === -1) {
-            input = input.split("\n").map(line => "  " + line).join("\n")
-            let output = [this.pre(ns), input, this.post()].join('\n')
-            fs.truncateSync(filename, 0)
-            fs.writeFileSync(filename, output, "utf8")
-        }
-    }
+/**
+ * reads the given filePath
+ * @param {string} filePath the file to read.
+ * @return {Promise<string>}
+ */
+const read = (filePath: string) => new Promise<string>((resolve, reject )=> {
+    fs.readFile(filePath, "utf8", (error, content) => {
+        if(error) return reject(error)
+        resolve(content)
+    })
+})
+/**
+ * writes the given filePath with the given content.
+ * @param {string} filePath the file to write.
+ * @param {string} content the content to write.
+ * @returns {Promise<string>}
+ */
+const write = (filePath: string, content: string) => new Promise<string>((resolve, reject) => {
+    fs.truncate(filePath, (error) => {
+        if(error) return error
+        fs.writeFile(filePath, content, "utf8", (error) => {
+            if(error) return error
+            resolve(null)
+        })
+    })
+})
+/**
+ * shims the given amd+outFile typescript output with a small module loader.
+ * @param {string} filePath the path of the file to shim.
+ * @param {string} ns the global namespace.
+ * @returns {void}
+ */
+export const shim = async (filePath: string, ns: string | undefined): Promise<any> => {
+    // read input file
+    const input = await read(filePath)
+    // prevent double shimming by testing for header section.
+    if (input.indexOf(header(ns)) !== -1 ) return
+    // indent the contents of the file.
+    const indented = input.split("\n").map(line => "  " + line).join("\n")
+    // shim the output.
+    const output   = [header(ns), indented, footer()].join('\n')
+    // overwrite the file.
+    await write(filePath, output)
 }
+

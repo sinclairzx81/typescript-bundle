@@ -1,10 +1,10 @@
 /*--------------------------------------------------------------------------
 
-typescript-bundle - compiles modular typescript projects into bundle consumable with a html script tag.
+typescript-bundle - bundle modular typescript projects for the browser
 
 The MIT License (MIT)
 
-Copyright (c) 2016 Haydn Paterson (sinclair) <haydn.developer@gmail.com>
+Copyright (c) 2016-2017 Haydn Paterson (sinclair) <haydn.developer@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,42 +25,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 ---------------------------------------------------------------------------*/
-
-import {Shell}   from "./shell"
-import {Log}     from "./log"
-import {Watcher} from "./watcher"
-
-export interface Compiler {
-  compile(command: string): Promise<{}>
-}
+import {shell}   from "./shell"
 
 /**
- * Compiler:
- * 
- * Wraps the typescript compiler at the command 
- * line. 
+ * invokes the typescript compiler with the given command.
+ * @param {string} command the typescript shell command.
+ * @param {Function} log the logging function.
+ * @returns {Promise<any>}
  */
-export class TypeScriptCompiler implements Compiler {
-
-  /**
-   * creates a new compiler instance.
-   * @param {Shell} the shell environment for this compiler.
-   * @param {Log} the output log object.
-   * @returns {Compiler}
-   */
-  constructor(private shell: Shell, private log: Log) { }
-  
-  /**
-   * kicks off the compiler with the given command.
-   * @parma {string} the compiler command line string.
-   * @returns {Promise<{}>}
-   */
-  public compile(command: string): Promise<{}> {
-    this.log.write(`\x1b[33m${command}\n\x1b[0m`)
-    return new Promise<{}>((resolve, reject) => {
-      this.shell.execute(command, 0).then(() => {
-        resolve({})
-      }).catch(reject)
-    })
-  }
+export const compile = async (command: string, log: Function = function() {}) : Promise<any> => {
+  const exitcode = await shell(command, log)
+  if(exitcode !== 0) throw Error("unexpected exit code")
 }

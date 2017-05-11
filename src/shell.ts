@@ -1,10 +1,10 @@
 /*--------------------------------------------------------------------------
 
-typescript-bundle - compiles modular typescript projects into bundle consumable with a html script tag.
+typescript-bundle - bundle modular typescript projects for the browser
 
 The MIT License (MIT)
 
-Copyright (c) 2016 Haydn Paterson (sinclair) <haydn.developer@gmail.com>
+Copyright (c) 2016-2017 Haydn Paterson (sinclair) <haydn.developer@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,50 +26,25 @@ THE SOFTWARE.
 
 ---------------------------------------------------------------------------*/
 
-import {spawn}  from "child_process"
-import {Log}    from "./log"
+import {spawn} from "child_process"
 
 /**
- * Shell:
- * provides a interface to execute shell commands.
+ * executes a shell command.
+ * @param {string} the command to execute.
+ * @param {Function} optional logging function.
+ * @returns {Promise<number>} the process exit code.
  */
-export class Shell {
-  private encoding : string
-  private windows  : boolean
-
-  /**
-   * creates a new shell object.
-   * @param {Log} the logging object to receive stdout.
-   * @returns {Shell} 
-   */
-  constructor(private log: Log) {
-    this.encoding = "utf8"
-    this.windows  = /^win/.test(process.platform) as boolean
-  }
-
-  /**
-   * executes a shell command.
-   * @param {string} the command to execute.
-   * @param {number} the expected exit code.
-   * @returns {Promise<{}>} promise when this process exits.
-   */
-  public execute(command: string, exitcode: number) : Promise<{}> {
-    return new Promise<{}>((resolve, reject) => {
-      let process = spawn (
-        this.windows ? 'cmd' : 'sh', 
-        [ this.windows ? '/c':'-c', command ]
-      )
-      process.stdout.setEncoding(this.encoding)
-      process.stderr.setEncoding(this.encoding)
-      process.stdout.on("data", data => this.log.write(data))
-      process.stderr.on("data", data => this.log.write(data))
-      process.on("close", e => {
-        if(exitcode === e) {
-          resolve()
-        }else {
-          reject(`unexpected exit code: expected ${exitcode} got ${e}.`)
-        }
-      })
-    })
-  }
-}
+export const shell = (command: string, log: Function = function() {}) => new Promise<number>((resolve, reject) => {
+  const encoding = "utf8"
+  const windows  = /^win/.test(process.platform) as boolean
+  const proc = spawn (
+    windows ? 'cmd' : 'sh', 
+    [ windows ? '/c':'-c', command ]
+  )
+  proc.stdout.setEncoding(encoding)
+  proc.stderr.setEncoding(encoding)
+  proc.stdout.on("data", data => log(data))
+  proc.stderr.on("data", data => log(data))
+  proc.on("error", error    => reject(error))
+  proc.on("close", exitcode => resolve(exitcode))
+})

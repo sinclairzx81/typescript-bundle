@@ -25,3 +25,41 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 ---------------------------------------------------------------------------*/
+
+import * as fs      from "fs"
+
+/** simple event debouncer */
+class Debounce {
+  private handle : NodeJS.Timer
+  constructor(private delay: number) {
+    this.handle = undefined
+  }
+  public emit(func: Function): void {
+    if(this.handle !== undefined) {
+      clearTimeout(this.handle)
+    }
+    this.handle = setTimeout(() => {
+      this.handle = undefined
+      func()
+    }, this.delay)
+  }
+}
+
+/** watcher handler to allow caller to terminate. */
+export class Watcher {
+  constructor(private watcher: fs.FSWatcher) {}
+  public close(): void {
+    this.watcher.close()
+  }
+}
+
+/** 
+ * watches the given filePath for changes.
+ * @param {string} filePath the file to watch.
+ * @param {Function} func the change event handler.
+ * @returns {Watcher}
+ */
+export const watch = (filePath: string, func: () => void): Watcher => {
+  const debounce = new Debounce(50)
+  return new Watcher(fs.watch(filePath, _ => debounce.emit(_ => func())))
+}

@@ -1,10 +1,10 @@
 /*--------------------------------------------------------------------------
 
-typescript-bundle - compiles modular typescript projects into bundle consumable with a html script tag.
+typescript-bundle - bundle modular typescript projects for the browser
 
 The MIT License (MIT)
 
-Copyright (c) 2016 Haydn Paterson (sinclair) <haydn.developer@gmail.com>
+Copyright (c) 2016-2017 Haydn Paterson (sinclair) <haydn.developer@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,37 +26,24 @@ THE SOFTWARE.
 
 ---------------------------------------------------------------------------*/
 
-/// <reference path="./@types/node/node.d.ts" />
+/// <reference path="./typings/node/node.d.ts" />
 
-import {Log, ConsoleLog}          from "./log"
-import {Options}                  from "./options"
-import {Pathing}                  from "./pathing"
-import {Shell}                    from "./shell"
-import {Provision}                from "./provision"
-import {TypeScriptCompiler}       from "./compiler"
-import {TypeScriptAmdOutFileShim} from "./shim"
-import {Bundler}                  from "./bundler"
+import {parse}   from "./options"
+import {bundle}  from "./bundle"
 
-//-------------------------------------------
-// setup !
-//-------------------------------------------
-let pathing   = new Pathing()
-let log       = new ConsoleLog()
-let shell     = new Shell(log)
-let compiler  = new TypeScriptCompiler(shell, log)
-let shim      = new TypeScriptAmdOutFileShim()
-let provision = new Provision()
-let bundler   = new Bundler (
-  pathing, 
-  provision,
-  compiler, 
-  shim, 
-  log)
+/**
+ * simple logging function.
+ * @param {string} data the data to log.
+ * @returns {any}
+ */
+const log = (data: string) => process.stdout.write(data)   
 
-//-------------------------------------------
-// bundle !
-//-------------------------------------------
-let options = new Options(process.argv)
-bundler.bundle(options).then(() => {}).catch(error => {
-  console.log("tsc-bundle:", error)
-})
+/**
+ * typescript-bundle entry point.
+ * @param {string[]} args the process command line options.
+ * @returns {Promise<any>}
+ */
+const main =  (args: string[]) => bundle(parse(args), log)
+
+// run it!
+main(process.argv).catch(error => log(error))

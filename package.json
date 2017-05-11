@@ -1,12 +1,14 @@
 {
   "name": "typescript-bundle",
-  "version": "0.8.0",
-  "description": "compiles modular typescript projects into bundle consumable with a html script tag.",
+  "version": "0.8.1",
+  "description": "bundle modular typescript projects for the browser.",
   "main": "./index.js",
   "scripts": {
   },
   "bin": {
-    "tsc-bundle": "./tsc-bundle"
+    "typescript-bundle": "./tsc-bundle",
+    "tsc-bundle": "./tsc-bundle",
+    "tscb": "./tsc-bundle"
   },
   "preferGlobal": true,
   "keywords": [
