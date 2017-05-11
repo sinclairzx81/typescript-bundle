@@ -1,6 +1,6 @@
 {
   "name": "typescript-bundle",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "bundle modular typescript projects for the browser.",
   "main": "./index.js",
   "scripts": {

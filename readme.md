@@ -53,7 +53,7 @@ typescript-bundle can also be configured by way of tsconfig.json, with the cavea
 {
   "compilerOptions": {
     "module": "amd",
-    "outFile": "output.js",
+    "outFile": "output.js"
   }, "files": [
     "input.ts"
   ]
