@@ -31,7 +31,7 @@ import { touch }         from "./touch"
 import { watch }         from "./watch"
 import { compile }       from "./compile"
 import { shim }          from "./shim"
-import { help, version, info, errors } from "./help"
+import { help, version, info, errors, done } from "./help"
 
 import * as path from "path"
 
@@ -70,12 +70,15 @@ export const bundle = async (options: Options, log: Function) => {
     })
     
     // run compilation.
+    const start = new Date()
     try {
       await compile (options.command, log)
       await shim    (outputFile, options.properties.exportAs)
       watcher.close ()
+      log(done())
     } catch (e) {
       shim(outputFile, options.properties.exportAs)
       watcher.close()
+      log(done())
     }
 }

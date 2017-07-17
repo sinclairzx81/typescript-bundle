@@ -93,7 +93,7 @@ const read = (filePath: string) => new Promise<string>((resolve, reject )=> {
 const write = (filePath: string, content: string) => new Promise<string>((resolve, reject) => {
     fs.truncate(filePath, (error) => {
         if(error) return error
-        fs.writeFile(filePath, content, "utf8", (error) => {
+        fs.writeFile(filePath, content, {encoding: "utf8"}, (error) => {
             if(error) return error
             resolve(null)
         })

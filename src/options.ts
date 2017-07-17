@@ -120,6 +120,7 @@ const validateArguments = (args: string[]): string [] => {
   const parts = args.slice()
   parts.shift()
   parts.shift()
+  if(mode === undefined)      return []
   if(mode.type === "help")    return []
   if(mode.type === "version") return []
   if(mode.type === "project") {

@@ -82,6 +82,6 @@ const provisionDirectory = (directory: string): void => {
 export const touch = (filePath: string): void => {
   provisionDirectory(path.dirname(filePath))
   if(shouldCreateFile(filePath) === true) {
-    fs.writeFileSync(filePath, "", "utf8")
+    fs.writeFileSync(filePath, "", { encoding: "utf8" })
   }
 }
