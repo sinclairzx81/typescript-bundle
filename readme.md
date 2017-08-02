@@ -30,7 +30,7 @@ typescript-bundle supports the majority of the typescript compiler switches, inc
 
 ## command line options
 
-typescript-bundle's cli is similar to the typescipt ```tsc``` cli with the exception that the user must specify 1 input file and 1 output
+typescript-bundle's cli is similar to the typescript ```tsc``` cli with the exception that the user must specify 1 input file and 1 output
 file up front. The input file should be the top most module in a given project, and should ```import``` all other modules to be part of a compilation.
 
 > typescript-bundle expects the ```input.ts``` typescript file to ```import``` other files to be included in the compilation, and ```export``` the members that are to be visable to the page.
