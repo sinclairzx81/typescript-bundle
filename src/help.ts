@@ -38,9 +38,11 @@ export const help = () => `
 
 \x1b[34musage:\x1b[0m
  
- typescript-bundle [input] [output] [--exportAs] [... tsc compiler options]
+ typescript-bundle input.ts output.js --exportAs app [... tsc compiler options]
 
- typescript-bundle --project [tsconfig] [--exportAs]
+ typescript-bundle input.tsx output.js --globalmap react=React,react-dom=ReactDOM --jsx
+
+ typescript-bundle --project .tsconfig.json --exportAs app
 
  typescript-bundle --help     
 

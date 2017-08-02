@@ -150,11 +150,18 @@ const validateArguments = (args: string[]): string [] => {
   } return result
 }
 
+// used for mapping UMD imports to modules
+export type GlobalMap = {
+  moduleName: string
+  globalName: string
+}
+
 export interface BunderProperties {
   // typescript-bundle defined.
   inputFile?                        : string
   outputFile?                       : string
   exportAs?                         : string
+  globalmap?                        : GlobalMap[]
 
   // typescript compiler defined.
   allowJs?                          : boolean
@@ -258,6 +265,7 @@ const parseBundlerProperties = (args: string[]): BunderProperties => {
       const tsconfig = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), options.project), "utf8"))
       options.outputFile = tsconfig.compilerOptions.outFile // require to provision.
       options.inputFile  = tsconfig.files[0]
+      options.globalmap  = []
     }
 
     // read command line arguments.
@@ -272,6 +280,17 @@ const parseBundlerProperties = (args: string[]): BunderProperties => {
         case "--globalNamespace":
           console.log("deprecation notice: switch --globalNamespace. use --exportAs instead.")    
           options.exportAs = parts.shift(); 
+          break;
+        case "--globalmap":
+          const option      = parts.shift();
+          const pairs       = option.trim().split(",").filter(n => n.length > 0)
+          options.globalmap = pairs.reduce((acc, pair) => {
+            const split = pair.split("=")
+            acc.push({
+              moduleName: split[0],
+              globalName: split[1]
+            }); return acc
+          }, []) as GlobalMap[]
           break;
         // typescript configurations.
         case "--allowJs":                           options.allowJs                          = true; break;

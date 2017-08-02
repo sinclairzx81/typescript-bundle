@@ -66,18 +66,18 @@ export const bundle = async (options: Options, log: Function) => {
 
     // watch output file for changes. (compile on save support)
     const watcher = watch(outputFile, () => {
-      shim(outputFile, options.properties.exportAs)
+      shim(outputFile, options.properties.exportAs, options.properties.globalmap)
     })
     
     // run compilation.
     const start = new Date()
     try {
       await compile (options.command, log)
-      await shim    (outputFile, options.properties.exportAs)
+      await shim    (outputFile, options.properties.exportAs, options.properties.globalmap)
       watcher.close ()
       log(done())
     } catch (e) {
-      shim(outputFile, options.properties.exportAs)
+      shim(outputFile, options.properties.exportAs, options.properties.globalmap)
       watcher.close()
       log(done())
     }
