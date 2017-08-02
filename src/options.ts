@@ -242,8 +242,8 @@ export interface BunderProperties {
 const parseBundlerProperties = (args: string[]): BunderProperties => {
   try {
     const options: BunderProperties = { }
+    options.globalmap  = []
     const mode = parseMode(args)
-
     if(mode.type === "help")    return { help   : true } 
     if(mode.type === "version") return { version: true }
 
@@ -265,7 +265,6 @@ const parseBundlerProperties = (args: string[]): BunderProperties => {
       const tsconfig = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), options.project), "utf8"))
       options.outputFile = tsconfig.compilerOptions.outFile // require to provision.
       options.inputFile  = tsconfig.files[0]
-      options.globalmap  = []
     }
 
     // read command line arguments.
