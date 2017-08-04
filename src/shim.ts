@@ -29,13 +29,13 @@ THE SOFTWARE.
 import * as fs from "fs"
 
 // used for mapping UMD imports to modules
-export type GlobalMap = {
+export type ImportAs = {
   moduleName: string
   globalName: string
 }
 
 // the amd module shim header.
-const header = (ns: string, globalmap: GlobalMap[]) => `${ns !== undefined ? `var ${ns} = ` : ""}(function () {
+const header = (ns: string, importas: ImportAs[]) => `${ns !== undefined ? `var ${ns} = ` : ""}(function () {
   var main = null;
   var modules = {
       "require": {
@@ -64,12 +64,16 @@ const header = (ns: string, globalmap: GlobalMap[]) => `${ns !== undefined ? `va
                   if(modules[id] !== undefined) {
                     resolve(modules[id]);
                     return modules[id].exports;
-                  }${globalmap.map(mapping => {
+                  }${importas.map(mapping => {
                     return ` else if(id === "${mapping.moduleName}") {
                     return window["${mapping.globalName}"];
                   }`
                   }).join('')} else {
-                    return require(id);
+                    try {
+                      return require(id);
+                    } catch(e) {
+                      throw Error("module '" + id + "' not found.");
+                    }
                   }
               })();
       });
@@ -117,16 +121,16 @@ const write = (filePath: string, content: string) => new Promise<string>((resolv
  * @param {string} ns the global namespace.
  * @returns {void}
  */
-export const shim = async (filePath: string, ns: string | undefined, globalmap: GlobalMap[]): Promise<any> => {
+export const shim = async (filePath: string, ns: string | undefined, importas: ImportAs[]): Promise<any> => {
     
     // read input file
     const input = await read(filePath)
     // prevent double shimming by testing for header section.
-    if (input.indexOf(header(ns, globalmap)) !== -1 ) return
+    if (input.indexOf(header(ns, importas)) !== -1 ) return
     // indent the contents of the file.
     const indented = input.split("\n").map(line => "  " + line).join("\n")
     // shim the output.
-    const output   = [header(ns, globalmap), indented, footer()].join('\n')
+    const output   = [header(ns, importas), indented, footer()].join('\n')
     // overwrite the file.
     await write(filePath, output)
 }

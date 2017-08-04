@@ -29,11 +29,22 @@ THE SOFTWARE.
 import * as path from "path"
 import * as fs   from "fs"
 
+//---------------------------------------------------------------------------
+// THIS FILE REQUIRES SIGNIFICANT REFACTORING.
+//---------------------------------------------------------------------------
 
 interface BundlerMode {
   type  : "arguments" | "project" | "help" | "version" | "invalid"
   errors: string[]
 }
+
+/** loads the tsconfig from the given path */
+const readTsConfig = (path: string): any =>  {
+  const content = fs.readFileSync(path, "utf8")
+  const pass    = JSON.stringify(eval("(" + content + ")")) // strip comments.
+  return JSON.parse(pass)
+}
+
 /** tests for the compilation mode. */
 const parseMode = (args: string []): BundlerMode => {
   let parts = args.slice()
@@ -81,31 +92,31 @@ const validateTsConfig = (tsconfigPath: string): string[] => {
     return result
   }
   // check valid json.
-  let config: any = null
+  let tsconfig: any = null
   try {
-    config = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), tsconfigPath), "utf8"))
+    tsconfig = readTsConfig(path.resolve(process.cwd(), tsconfigPath))
   } catch (e) {
     result.push("error: tsconfig is not valid json.")
     return result
   }
   // validate --module amd
-  if(config.compilerOptions.module === undefined || config.compilerOptions.module !== "amd") {
+  if(tsconfig.compilerOptions.module === undefined || tsconfig.compilerOptions.module !== "amd") {
     result.push("error: tsconfig.compilerOptions.module be set to 'amd'.")
   }
   // validate --outFile option.
-  if(config.compilerOptions.outFile === undefined) {
+  if(tsconfig.compilerOptions.outFile === undefined) {
     result.push("error: tsconfig.compilerOptions.outFile path must be specified.")
   }
   // validate --outDir
-  if(config.compilerOptions.outDir !== undefined) {
+  if(tsconfig.compilerOptions.outDir !== undefined) {
     result.push("error: tsconfig.compilerOptions.outDir is not allowed.")
   }
   // validate --moduleResolution
-  if(config.compilerOptions.moduleResolution !== undefined) {
+  if(tsconfig.compilerOptions.moduleResolution !== undefined) {
     result.push("error: tsconfig.compilerOptions.moduleResolution is not allowed.")
   }
   // validate --files
-  if(config.files === undefined || config.files.length !== 1) {
+  if(tsconfig.files === undefined || tsconfig.files.length !== 1) {
     result.push("error: tsconfig.files array must contain exactly 1 input file.")
   }
   return result
@@ -151,7 +162,7 @@ const validateArguments = (args: string[]): string [] => {
 }
 
 // used for mapping UMD imports to modules
-export type GlobalMap = {
+export type ImportAs = {
   moduleName: string
   globalName: string
 }
@@ -161,7 +172,7 @@ export interface BunderProperties {
   inputFile?                        : string
   outputFile?                       : string
   exportAs?                         : string
-  globalmap?                        : GlobalMap[]
+  importAs?                         : ImportAs[]
 
   // typescript compiler defined.
   allowJs?                          : boolean
@@ -242,7 +253,7 @@ export interface BunderProperties {
 const parseBundlerProperties = (args: string[]): BunderProperties => {
   try {
     const options: BunderProperties = { }
-    options.globalmap  = []
+    options.importAs  = []
     const mode = parseMode(args)
     if(mode.type === "help")    return { help   : true } 
     if(mode.type === "version") return { version: true }
@@ -262,7 +273,7 @@ const parseBundlerProperties = (args: string[]): BunderProperties => {
     if(mode.type === "project") {
       parts.shift() // unshift --project option
       options.project = parts.shift()
-      const tsconfig = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), options.project), "utf8"))
+      const tsconfig = readTsConfig(path.resolve(process.cwd(), options.project))
       options.outputFile = tsconfig.compilerOptions.outFile // require to provision.
       options.inputFile  = tsconfig.files[0]
     }
@@ -271,7 +282,7 @@ const parseBundlerProperties = (args: string[]): BunderProperties => {
     while (parts.length > 0) {
       switch (parts.shift()) {
         // typescript-bundle configurations.
-        case "--exportAs":                          options.exportAs                         = parts.shift(); break;
+        case "--exportAs": options.exportAs = parts.shift(); break;
         case "-gns":
           console.log("deprecation notice: switch --gns. use --exportAs instead.")    
           options.exportAs = parts.shift(); 
@@ -280,16 +291,16 @@ const parseBundlerProperties = (args: string[]): BunderProperties => {
           console.log("deprecation notice: switch --globalNamespace. use --exportAs instead.")    
           options.exportAs = parts.shift(); 
           break;
-        case "--globalmap":
+        case "--importAs":
           const option      = parts.shift();
           const pairs       = option.trim().split(",").filter(n => n.length > 0)
-          options.globalmap = pairs.reduce((acc, pair) => {
+          options.importAs = pairs.reduce((acc, pair) => {
             const split = pair.split("=")
             acc.push({
               moduleName: split[0],
               globalName: split[1]
             }); return acc
-          }, []) as GlobalMap[]
+          }, []) as ImportAs[]
           break;
         // typescript configurations.
         case "--allowJs":                           options.allowJs                          = true; break;

@@ -40,17 +40,13 @@ export const help = () => `
  
  typescript-bundle input.ts output.js --exportAs app [... tsc compiler options]
 
- typescript-bundle input.tsx output.js --globalmap react=React,react-dom=ReactDOM --jsx
+ typescript-bundle input.ts output.js --importAs react=React,react-dom=ReactDOM
 
- typescript-bundle --project .tsconfig.json --exportAs app
+ typescript-bundle --project tsconfig.json
 
  typescript-bundle --help     
 
- typescript-bundle --version                  
-
-\x1b[34mexample:\x1b[0m
-
- tsc-bundle ./input.ts ./scripts/bundle.js --exportAs myapp
+ typescript-bundle --version
 
 `
 

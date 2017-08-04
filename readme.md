@@ -1,54 +1,79 @@
 # typescript-bundle
-### bundle modular typescript projects for the browser
+
+bundle modular typescript projects for the browser
+
+## usage
+
+```typescript
+export function helloworld () { ... }
+```
+
+```
+tsc-bundle app.ts app.js --exportAs app
+```
+
+```html
+<script src="./app.js"></script>
+<script>
+    app.helloworld()
+</script>
+```
+
 ## install
 ```
 npm install typescript -g
 npm install typescript-bundle -g 
 ```
-## usage
-code ```myapp.ts```
-```typescript
-export function helloworld() { ... }
-```
-compile
-```
-tsc-bundle myapp.ts myapp.js --exportAs myapp
-```
-run
-```html
-<script src="./myapp.js"></script>
-<script>
-    myapp.helloworld()
-</script>
-```
 
 ## overview
 
-typescript-bundle is a minimal command line utility for compiling modular typescript projects into a single output script that is consumable inside a web page with a ```<script>``` tag. It directly layers the typescript compiler cli, and allows for multi file modular typescript projects to be written and consumed in a website with no additional tooling. 
+typescript-bundle is a command line utility for compiling modular typescript projects into a single output script that is consumable inside a web page with a simple ```<script>``` tag. 
 
-typescript-bundle supports the majority of the typescript compiler switches, including compile on save for fast and rapid typescript workflows. 
+typescript-bundle layers the typescript compiler directly and supports many of the compilers options ( including ```---watch``` ) and aims to be a quick, easy to use bundling alternative for typescript centric projects.
+
+[command line options](#command-line-options)
+- [quick start](#quick-start)
+- [exportAs](#exportAs)
+- [importAs](#importAs)
+- [tsconfig](#tsconfig)
+
+[how does this project work](#how-does-this-project-work)
+
+[some notes](#notes)
 
 ## command line options
 
-typescript-bundle's cli is similar to the typescript ```tsc``` cli with the exception that the user must specify 1 input file and 1 output
-file up front. The input file should be the top most module in a given project, and should ```import``` all other modules to be part of a compilation.
-
-> typescript-bundle expects the ```input.ts``` typescript file to ```import``` other files to be included in the compilation, and ```export``` the members that are to be visable to the page.
-
-The command line interface is as follows...
+### quick start
+typescript-bundle expects one input file and one output file be specified upfront. The following bundles ```input.ts``` to ```output.js```
 ```
-tsc-bundle [input] [output] [--exportAs] [...standard tsc compiler options]
+tsc-bundle input.ts output.js [... other typescript compiler options here]
 ```
-An example of which might look something like...
+### exportAs
+It is possible to export your module as a global name in the page with the ```--exportAs``` option.
 ```
-tsc-bundle input.ts output.js --exportAs myapp --target es2015 --noImplicitAny --watch
+tsc-bundle input.ts output.js --exportAs foo
 ```
-> typescript-bundle supports most of the tsc compiler switches except for ```--module``` and ```--outFile``` which are internally set to ```AMD``` and the given output filename respectively.
+This will allow the exports on ```input.ts``` to be made available to the page with ```foo.bar()```. If ommited, your bundle will be wrapped in the closure.
 
-> the ```--exportAs``` option will expose the given name ```myapp``` to the page. If omitted, typecript-bundle will simply wrap all compiled modules within a function closure, with exported modules inaccessible to the page.
+### importAs
 
-typescript-bundle can also be configured by way of tsconfig.json, with the caveat that the configuration must conform to typescript-bundles internal specification. The minimal basic configuration is as follows. 
+It is sometimes desirable to be able to reference global objects inside a bundle. This is typically the case or libraries like ```React``` which may be included in the page with ```<script>``` external the bundle.
 
+```typescript
+import { React }    from "react"
+import { ReactDOM } from "react-dom"
+```
+which can be resolved with.
+```
+tsc-bundle input.ts output.js --importAs react=React,react-dom=ReactDOM
+```
+
+### project
+You can pass the ```--project``` option to have typescript-bundle use its configurations with.
+```
+tsc-bundle --project ./tsconfig.json
+```  
+typescript-bundle does however mandate the following settings be set. So it is recommended keeping a seperate configuration for bundling.
 ```json
 {
   "compilerOptions": {
@@ -58,32 +83,29 @@ typescript-bundle can also be configured by way of tsconfig.json, with the cavea
     "input.ts"
   ]
 }
-``` 
-which can be compiled with...
 ```
-tsc-bundle --project ./tsconfig.json -exportAs myapp
-```
-> developers are free to configure all other compiler switches with the exception of ```--moduleResolution``` and ```--outDir``` which must be left undefined.
+note: the ```--moduleResolution``` and ```--outDir``` must be left unset.
 
+note: the ```files``` should contain only one file path.
+
+note: the ```exportAs``` and ```importAs``` are still required to be passed at the command line.
 ## how does this project work
 
-typescript-bundle internally calls the typescript compiler with the options ```--module amd``` and
-```--outFile```. This causes the typescript compiler to emit a single AMD bundle containing all modules
-it locates by traversing imports throughout the project. From here, typescript-bundle rewrites the 
-compilers output with a mini AMD module loader which is used to wrap the compilers output.
+typescript-bundle wraps the default typescript output when the compiler is configured with ```--module amd``` and ```--outFile``` options. By default, this causes the compiler to emit all modules into a single output javascript file, however the compiler does not emit any AMD loading infrastructure. This is specifically what typescript-bundle provides. 
 
-A high level view of the bundles output is as follows.
+A high level view of typescript-bundle's output is as follows.
 
 ```javascript
 var [exportAs] = (function() {
 
-  [typescript-bundle module loader]
+  [typescript-bundle amd loader]
 
-  [typescript amd outfile bundle]
+  [typescript amd outfile output]
 
   return collect()
 })()
 ```
+The author of this project hopes that typescript may one day include this functionality as part of the compiler itself. At which time this project will be marked deprecated.
 
 ## notes
 
@@ -98,7 +120,7 @@ to ```--module amd``` and ```--outFile [bundle.js]``` where bundle.js is provide
 - source maps are not available. 
 
 ## building the project
-The project can be built by running the following command from the project root.
+The project can be built locally by running the following command from the project root.
 ```
 node tasks build
 ```

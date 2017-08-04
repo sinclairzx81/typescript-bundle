@@ -1,14 +1,12 @@
 {
   "name": "typescript-bundle",
-  "version": "0.8.5",
+  "version": "0.8.6",
   "description": "bundle modular typescript projects for the browser.",
   "main": "./index.js",
   "scripts": {
   },
   "bin": {
-    "typescript-bundle": "./tsc-bundle",
-    "tsc-bundle": "./tsc-bundle",
-    "tscb": "./tsc-bundle"
+    "tsc-bundle": "./tsc-bundle"
   },
   "preferGlobal": true,
   "keywords": [

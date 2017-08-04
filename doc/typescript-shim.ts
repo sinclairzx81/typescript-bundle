@@ -70,7 +70,22 @@ var [gns] = (function () {
         if(modules[id] !== undefined) {
           resolve(modules[id]);
           return modules[id].exports;
-        } else return require(id)
+        } 
+        // note: we inject global mappings here 
+        // as else if statements specified from the 
+        // --globalmap option.
+        //
+        // this option provided to allow users to
+        // bind in external libraries (like react,
+        // immutablejs, etc) where the module is
+        // UMD loaded.
+        else {
+          try {
+            return require(id);
+          } catch(e) {
+            throw Error("module '" + id + "' not found.");
+          }
+        }
       })()
     )
     definition.factory.apply(null, dependencies)
