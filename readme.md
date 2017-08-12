@@ -8,10 +8,8 @@ bundle typescript projects for the browser and node.
 export function helloworld () { ... }
 ```
 
-```
-
+```html
 tsc-bundle app.ts app.js --exportAs app
-
 ```
 
 ```html
