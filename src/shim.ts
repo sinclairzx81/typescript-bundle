@@ -34,8 +34,19 @@ export type ImportAs = {
   globalName: string
 }
 
+/**
+ * resolves the module namespace. if passing NODEMODULE we resolve
+ * a module.exports. otherwise the global var name.
+ * @param {string} ns the namespace to resolve.
+ * @returns {string}
+ */
+const resolveNS = (ns: string) => 
+  (ns === undefined)    ? "" :                      
+  (ns === "COMMONJS") ? "module.exports = " : 
+  `var ${ns} = ` 
+
 // the amd module shim header.
-const header = (ns: string, importas: ImportAs[]) => `${ns !== undefined ? `var ${ns} = ` : ""}(function () {
+const header = (ns: string, importas: ImportAs[]) => `${resolveNS(ns)}(function () {
   var main = null;
   var modules = {
       "require": {
