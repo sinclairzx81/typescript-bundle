@@ -111,10 +111,6 @@ const validateTsConfig = (tsconfigPath: string): string[] => {
   if(tsconfig.compilerOptions.outDir !== undefined) {
     result.push("error: tsconfig.compilerOptions.outDir is not allowed.")
   }
-  // validate --moduleResolution
-  if(tsconfig.compilerOptions.moduleResolution !== undefined) {
-    result.push("error: tsconfig.compilerOptions.moduleResolution is not allowed.")
-  }
   // validate --files
   if(tsconfig.files === undefined || tsconfig.files.length !== 1) {
     result.push("error: tsconfig.files array must contain exactly 1 input file.")
@@ -155,7 +151,6 @@ const validateArguments = (args: string[]): string [] => {
   while(parts.length > 0) {
     const part = parts.shift()
     if(part === "--module")           result.push("error: --module switch is not supported.\n")
-    if(part === "--moduleResolution") result.push("error: --moduleResolution switch is not supported.\n")
     if(part === "--outDir")           result.push("error: --outDir option is not supported.\n")
     if(part === "--outFile")          result.push("error: --outFile option is not supported.\n")
   } return result
@@ -207,7 +202,7 @@ export interface BunderProperties {
   mapRoot?                          : string
   maxNodeModuleJsDepth?             : number
   // (ignore) module?               : string
-  // (ignore) moduleResolution?     : string | "node" | "classic"
+  moduleResolution?                 : string | "node" | "classic"
   newLine?                          : string
   noEmit?                           : boolean
   noEmitHelpers?                    : boolean
@@ -336,7 +331,7 @@ const parseBundlerProperties = (args: string[]): BunderProperties => {
         case "--mapRoot":                           options.mapRoot                          = parts.shift(); break;
         case "--maxNodeModuleJsDepth":              options.maxNodeModuleJsDepth             = parseInt(parts.shift()); break;
         // (ignore) case "--module":                options.module                           = parts.shift(); break;
-        // (ignore) case "--moduleResolution":      options.moduleResolution                 = parts.shift(); break;
+        case "--moduleResolution":                  options.moduleResolution                 = parts.shift(); break;
         // (ignore) case "--paths":                 options.paths                            = parts.shift(); break; 
         case "--newLine":                           options.newLine                          = parts.shift(); break;
         case "--noEmit":                            options.noEmit                           = true; break;
@@ -423,7 +418,7 @@ const parseTscCommand = (mode: BundlerMode, options: BunderProperties): string =
   if (options.mapRoot)                          buffer.push("--mapRoot " + options.mapRoot)
   if (options.maxNodeModuleJsDepth)             buffer.push("--maxNodeModuleJsDepth " + options.maxNodeModuleJsDepth.toString())
   // (ignore) if(options.module)                buffer.push("--module " + options.module) */
-  // (ignore) if(options.moduleResolution)      buffer.push("--moduleResolution " + options.moduleResolution)
+  if (options.moduleResolution)                 buffer.push("--moduleResolution " + options.moduleResolution)
   if (options.newLine)                          buffer.push("--newLine "          + options.newLine)
   if (options.noEmit)                           buffer.push("--noEmit")
   if (options.noEmitHelpers)                    buffer.push("--noEmitHelpers")
