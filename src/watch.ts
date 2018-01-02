@@ -26,7 +26,7 @@ THE SOFTWARE.
 
 ---------------------------------------------------------------------------*/
 
-import * as fs      from "fs"
+import * as fs from "fs"
 
 /** simple event debouncer */
 class Debounce {

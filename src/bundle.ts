@@ -30,6 +30,7 @@ import { Options }       from "./options"
 import { touch }         from "./touch"
 import { watch }         from "./watch"
 import { compile }       from "./compile"
+import { delay }         from "./delay"
 import { shim }          from "./shim"
 import { help, version, info, errors, done } from "./help"
 
@@ -43,42 +44,69 @@ import * as path from "path"
  * @returns {Promise<any>} 
  */
 export const bundle = async (options: Options, log: Function) => {
-    // run validation, help and version checks.
-    if(options.errors.length > 0)  return log(errors(options))
-    if(options.properties.help)    return log(help())
-    if(options.properties.version) return log(await version())
+  // ----------------------------------------------------------
+  //
+  // run validation, help and version checks.
+  //
+  // ----------------------------------------------------------
+  if(options.errors.length > 0)  { return log(errors(options)) }
+  if(options.properties.help)    { return log(help()) }
+  if(options.properties.version) { return log(await version()) }
 
-    // display compiler settings.
-    log(info(options))
+  // ----------------------------------------------------------
+  //
+  // display compiler settings.
+  //
+  // ----------------------------------------------------------
+  log(info(options))
 
-    // if we are loading from a project, then we need to resolve
-    // the output file path from the view of the config.
-    const outputFile = (options.properties.project === undefined)
-      ? path.resolve(process.cwd(), options.properties.outputFile)
-      : path.resolve(
-          path.dirname(
-            path.resolve(process.cwd(), options.properties.project
-            ) ), options.properties.outputFile)
-      
+  // ----------------------------------------------------------
+  //
+  // if we are loading from a project, then we need to resolve
+  // the output file path from the view of the config.
+  //
+  // ----------------------------------------------------------
+  const outputFile = (options.properties.project === undefined)
+    ? path.resolve(process.cwd(), options.properties.outputFile)
+    : path.resolve(
+        path.dirname(
+          path.resolve(process.cwd(), options.properties.project
+          ) ), options.properties.outputFile);
+  
+  // ----------------------------------------------------------
+  //
+  // watch
+  //
+  // ----------------------------------------------------------
+  if (options.properties.watch === true) {
 
-    // ensure the output file exists.
+    // ensure the output file exists..
     await touch(outputFile)
-
-    // watch output file for changes. (compile on save support)
-    const watcher = watch(outputFile, () => {
-      shim(outputFile, options.properties.exportAs, options.properties.importAs)
-    })
     
-    // run compilation.
-    const start = new Date()
-    try {
-      await compile (options.command, log)
-      await shim    (outputFile, options.properties.exportAs, options.properties.importAs)
-      watcher.close ()
-      log(done())
-    } catch (e) {
-      shim(outputFile, options.properties.exportAs, options.properties.importAs)
-      watcher.close()
-      log(done())
-    }
+    // start watcher process..
+    watch(outputFile, () => shim(outputFile, options.properties.exportAs, options.properties.importAs))
+    
+    // compile..
+    compile (options.command, log)
+  }
+
+  // ----------------------------------------------------------
+  //
+  // standard
+  //
+  // ----------------------------------------------------------
+  else {
+
+    // compile
+    await compile (options.command, log)
+
+    // wait a bit..
+    await delay (100)
+
+    // shim
+    await shim (outputFile, options.properties.exportAs, options.properties.importAs)
+    
+    // complete
+    log(done())
+  }
 }

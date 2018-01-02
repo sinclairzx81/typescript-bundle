@@ -26,7 +26,7 @@ THE SOFTWARE.
 
 ---------------------------------------------------------------------------*/
 
-import {spawn} from "child_process"
+import { spawn } from "child_process"
 
 /**
  * executes a shell command.

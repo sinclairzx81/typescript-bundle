@@ -25,15 +25,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 ---------------------------------------------------------------------------*/
-import {shell}   from "./shell"
+import { shell }   from "./shell"
 
 /**
  * invokes the typescript compiler with the given command.
  * @param {string} command the typescript shell command.
  * @param {Function} log the logging function.
- * @returns {Promise<any>}
+ * @returns {Promise<void>}
  */
-export const compile = async (command: string, log: Function = function() {}) : Promise<any> => {
+export const compile = async (command: string, log: Function = function() {}) : Promise<void> => {
   const exitcode = await shell(command, log)
-  if(exitcode !== 0) throw Error("unexpected exit code")
+  if(exitcode !== 0) {
+    process.exit(exitcode)
+  }
 }

@@ -26,65 +26,9 @@ THE SOFTWARE.
 
 ---------------------------------------------------------------------------*/
 
-import { Options } from "./options"
-import { shell }   from "./shell"
-
-const VERSION = "[[[VERSION_STRING]]]"
-
-export const help = () => `
-\x1b[34mtypescript-bundle\x1b[0m
-
- Version ${VERSION}
-
-\x1b[34musage:\x1b[0m
- 
- typescript-bundle input.ts output.js --exportAs app [... tsc compiler options]
-
- typescript-bundle input.ts output.js --importAs react=React,react-dom=ReactDOM
-
- typescript-bundle --project tsconfig.json
-
- typescript-bundle --help     
-
- typescript-bundle --version
-
-`
-
-export const errors = (option: Options) => {
-  return `
-\x1b[34mtypescript-bundle\x1b[0m
-
-${option.errors.map(error => " " + error).join('\n')}
-
-`
-}
-
-export const version = async () => {
-  let tsc_version = ""
-  await shell("tsc -v", (data) => tsc_version = data)
-  return `
-\x1b[34mtypescript-bundle\x1b[0m
-
- Version ${VERSION}
-
-\x1b[34mtypescript\x1b[0m
-
- ${tsc_version}
-`
-} 
-
-export const info = (options: Options) => {
-  return `
-\x1b[34mtypescript-bundle\x1b[0m  
-
- ${options.command}
-
-\x1b[34mtypescript\x1b[0m
-
-`
-}
-
-
-export const done = () => {
-  return `\x1b[34mdone\x1b[0m\n\n`
-}
+/**
+ * preforms a simple delay with the given milliseconds.
+ * @param {number} ms the number of milliseconds to delay.
+ * @returns {Promise<void>}
+ */
+export const delay = (ms: number) => new Promise<void>(resolve => setTimeout(() => resolve(), ms))

@@ -101,7 +101,7 @@ typescript-bundle does however mandate the following settings be set. So it is r
   ]
 }
 ```
-note: the ```--moduleResolution``` and ```--outDir``` must be left unset.
+note: the ```--outDir``` must be left unset.
 
 note: the ```files``` should contain only one file path.
 
