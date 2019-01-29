@@ -82,15 +82,16 @@ interface Instance {
   //
   // section: require
   //
-  // Adds the default 'require' import for the module.
+  // Adds the default 'require' import for the module, if in the
+  // browser, we just assign an empty.
   //
   // ------------------------------------------------------------
 
   define("require", ["exports"], (exports: any) => {
 
-    Object.defineProperty(exports, "__cjsModule", { value: true });
+    Object.defineProperty(exports, "__cjsModule", { value: true })
 
-    Object.defineProperty(exports, "default", { value: require });
+    Object.defineProperty(exports, "default", { value: (name: string) => resolve(name) })
   })
 
   // ------------------------------------------------------------

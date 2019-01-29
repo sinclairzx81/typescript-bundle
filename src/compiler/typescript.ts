@@ -26,8 +26,9 @@ THE SOFTWARE.
 
 ---------------------------------------------------------------------------*/
 
-import { Watcher } from './watcher'
-import { spawn }   from 'child_process'
+import { Watcher }      from './watcher'
+import { spawn }        from 'child_process'
+import { readFileSync } from 'fs'
 
 // --------------------------------------------------------------------------
 //
@@ -64,7 +65,7 @@ export class TypeScript {
   public static async compile(typescriptOptions: TypeScriptOptions, diagnosticCallback: TypeScriptDiagnosticCallback, contentCallback: TypeScriptContentCallback): Promise<number> {
     return new Promise(async (resolve, reject) => {
       let signal = false
-
+      
       // Starts a file system watcher waiting for TypeScript to emit content.
       const watcher = Watcher.watch(typescriptOptions.outFile, event => {
         contentCallback(event.content)
@@ -76,9 +77,11 @@ export class TypeScript {
         // Executes the typescript compiler.
         await this.execute(typescriptOptions, diagnostic =>  diagnosticCallback(diagnostic))
     
-        // On finish, wait for the signal indicating content emit.
+        // On process end, wait for content signal or timeout.
+        let start = Date.now()
         const wait = () => {
-          if(signal) {
+          const delta = Date.now() - start
+          if(signal || delta > 2000) {
             watcher.dispose()
             return resolve()
           }
@@ -111,7 +114,7 @@ export class TypeScript {
       })
     })
   }
-  
+
   /**  Resolves the TypeScript compiler command line arguments. */
   private static getCompilerStartOptions(options: TypeScriptOptions): {
     command: string

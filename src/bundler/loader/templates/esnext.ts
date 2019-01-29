@@ -7,7 +7,7 @@ export default `(() => {
     }
     define("require", ["exports"], (exports) => {
         Object.defineProperty(exports, "__cjsModule", { value: true });
-        Object.defineProperty(exports, "default", { value: require });
+        Object.defineProperty(exports, "default", { value: (name) => resolve(name) });
     });
     'marker:bundle';
     function get_define(name) {

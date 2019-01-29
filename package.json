@@ -1,6 +1,6 @@
 {
   "name": "typescript-bundle",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": " A zero configuration bundling tool for TypeScript.",
   "scripts": {
     "clean": "node tasks clean",
