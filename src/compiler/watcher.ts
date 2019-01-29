@@ -32,10 +32,40 @@ import { dirname, resolve, join }                from 'path'
 
 // --------------------------------------------------------------------------
 //
+// ResetTimeout
+//
+// A specialized timeout used to debounce file system 'change' events. This
+// class provides a 'run()' method that can be called many times in quick
+// succession with only the 'last' function passed to run() being invoked
+// within the timeout threshold. This timeout is required when TypeScript
+// emits amounts of code that overlap with the bundler downstream.
+//
+// --------------------------------------------------------------------------
+class ResetTimeout {
+  private timer!: NodeJS.Timer
+  private resets: number
+  constructor(private timeout: number, private maxResets: number = 256) {
+    this.resets = 0
+  }
+  public run(func: () => void) {
+    this.resets += 1
+    clearTimeout(this.timer)
+    if(this.resets >= this.maxResets) {
+      throw Error(`ResetTimeout: exceeded maximum reset count of ${this.maxResets}`)
+    }
+    this.timer = setTimeout(() => {
+      this.resets = 0
+      func()
+    }, this.timeout)
+  }
+}
+
+// --------------------------------------------------------------------------
+//
 // WatchTarget
 //
-// Creates a target file for the Watcher to watch. This file is exclusively
-// the --outFile of the TypeScript compiler.
+// Provisions the watchers file target by creating the file and its respective
+// directory path. Needed by the watcher to observe on an actual file.
 //
 // --------------------------------------------------------------------------
 
@@ -44,7 +74,7 @@ class WatchTarget {
     try {
       const stat = statSync(directoryPath)
       return stat.isDirectory() ? false : true
-    } catch (e) {
+    } catch {
       return true
     }
   }
@@ -70,9 +100,9 @@ class WatchTarget {
 //
 // Watcher
 //
-// Simple file system watcher, leveraged by the TypeScript compiler host
-// to signal when content has been written. Keeps track of content emitted
-// fro the compiler to prevent double bundling downstream on same content.
+// File system watcher utility. Specialized to observe on TypeScript content
+// being emitted to disk. This watcher is used exclusively by the TypeScript
+// compiler host.
 //
 // -------------------------------------------------------------------------
 
@@ -82,18 +112,18 @@ export class WatchHandle {
     this.watcher.close()
   }
 }
-
 export interface WatchEvent {
   content: string
 }
-
 export type WatcherCallbackFunction = (event: WatchEvent) => void
 
 export class Watcher {
+  
   /** Watches the given file path and emits 'only' on file change events. */
   public static watch(filePath: string, func: WatcherCallbackFunction): WatchHandle {
 
     // resolve target file and directory paths.
+    const timeout               = new ResetTimeout(50)
     const resolvedFilePath      = resolve(filePath)
     const resolvedDirectoryPath = dirname(resolvedFilePath)
 
@@ -101,16 +131,14 @@ export class Watcher {
     WatchTarget.createEmptyFile(resolvedFilePath)
 
     // track last content from compiler.
-    let last_content = ''
     return new WatchHandle(watch(resolvedFilePath, (event: string, filePath) => {
       const joinedPath = join(resolvedDirectoryPath, filePath)
       if(joinedPath === resolvedFilePath) {
         if(event === 'change') {
-          const content = readFileSync(resolvedFilePath, 'utf8')
-          if(last_content !== content) {
-            last_content = content
+          timeout.run(() => {
+            const content = readFileSync(resolvedFilePath, 'utf8')
             func({ content })
-          }
+          })
         }
       }
     }))

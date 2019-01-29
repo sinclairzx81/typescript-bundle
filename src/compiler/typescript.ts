@@ -75,13 +75,13 @@ export class TypeScript {
       try {
 
         // Executes the typescript compiler.
-        await this.execute(typescriptOptions, diagnostic =>  diagnosticCallback(diagnostic))
+        await this.execute(typescriptOptions, diagnostic => diagnosticCallback(diagnostic))
     
         // On process end, wait for content signal or timeout.
         let start = Date.now()
         const wait = () => {
           const delta = Date.now() - start
-          if(signal || delta > 2000) {
+          if(signal || delta > 1000) {
             watcher.dispose()
             return resolve()
           }
