@@ -29,9 +29,9 @@ THE SOFTWARE.
 import { readFileSync } from 'fs'
 import { render }       from './render'
 
-function get(fileName: string): string {
+function get(filePath: string): string {
   try {
-    const content = readFileSync(fileName) as Uint8Array
+    const content = readFileSync(filePath) as Uint8Array
     const buffer = [...content]
     return `new Uint8Array([${buffer.join(',')}])`
   } catch {
@@ -39,6 +39,6 @@ function get(fileName: string): string {
   }
 }
 
-export function asBuffer(moduleName: string, fileName: string) {
-  return render(moduleName, get(fileName))
+export function asBuffer(moduleName: string, filePath: string) {
+  return render(moduleName, get(filePath))
 }

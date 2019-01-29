@@ -29,9 +29,9 @@ THE SOFTWARE.
 import { readFileSync } from 'fs'
 import { render }       from './render'
 
-function get(fileName: string): string {
+function get(filePath: string): string {
   try {
-    const buffer = readFileSync(fileName)
+    const buffer = readFileSync(filePath)
     return `"${buffer.toString('base64')}"`
   } catch {
     const buffer = Buffer.from([])
@@ -39,6 +39,6 @@ function get(fileName: string): string {
   }
 }
 
-export function asBase64(moduleName: string, fileName: string) {
-  return render(moduleName, get(fileName))
+export function asBase64(moduleName: string, filePath: string) {
+  return render(moduleName, get(filePath))
 }

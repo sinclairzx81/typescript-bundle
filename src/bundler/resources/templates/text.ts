@@ -29,9 +29,9 @@ THE SOFTWARE.
 import { render }       from './render'
 import { readFileSync } from 'fs'
 
-function get(fileName: string): string {
+function get(filePath: string): string {
   try {
-    const content = readFileSync(fileName, 'utf8')
+    const content = readFileSync(filePath, 'utf8')
     const lines = content.split('\n').map(line => {
       const text = line
         .replace(/\\/g, '\\\\"')
@@ -44,6 +44,6 @@ function get(fileName: string): string {
   }
 }
 
-export function asText(moduleName: string, fileName: string) {
-  return render(moduleName, get(fileName))
+export function asText(moduleName: string, filePath: string) {
+  return render(moduleName, get(filePath))
 }

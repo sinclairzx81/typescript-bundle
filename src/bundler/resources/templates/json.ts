@@ -34,10 +34,10 @@ function formatJson(data: any): string {
   return JSON.stringify(data, null, 2).split('\n').map((n, i) => (i > 0) ? `  ${n}`: n).join("\n")
 }
 
-function get(fileName: string): string {
+function get(filePath: string): string {
   let content = ''
   try {
-    content = readFileSync(fileName, 'utf8')
+    content = readFileSync(filePath, 'utf8')
   } catch(error) {
     return formatJson({ error: 'unable to load resource'})
   }
@@ -49,6 +49,6 @@ function get(fileName: string): string {
   }
 }
 
-export function asJson(moduleName: string, fileName: string) {
-  return render(moduleName, get(fileName))
+export function asJson(moduleName: string, filePath: string) {
+  return render(moduleName, get(filePath))
 }

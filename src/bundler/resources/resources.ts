@@ -68,7 +68,7 @@ interface AMDResult {
 }
 class AMDReader {
   public static read(code: string): AMDResult {
-    const document: AMDResult = { defines: [], remaps: {} }
+    const result: AMDResult = { defines: [], remaps: {} }
     const resource_names: {[name: string]: null} = {}
     const pattern = /define\s*\("(.*)",\s*\[(.*)],\s*function/gm
     while(true) {
@@ -90,8 +90,8 @@ class AMDReader {
             const directive = split[0]
             const absoluteName = join(module_root, split[1])
             const resource = `${directive}!${absoluteName}`
-            document.remaps[resource] = document.remaps[resource] || []
-            document.remaps[resource].push(dependency)
+            result.remaps[resource] = result.remaps[resource] || []
+            result.remaps[resource].push(dependency)
             resource_names[resource] = null
             return resource
           }
@@ -99,18 +99,35 @@ class AMDReader {
         return dependency
       })
       const define = { type, name, dependencies: dependencies }
-      document.defines.push(define as Define)
+      result.defines.push(define as Define)
+    }
+    
+    // Resolve the resource path prefix. This is resolved from the
+    // 'last' definition in the bundle. We are looking for multi
+    // component paths (i.e 'parent/index'). This indicates that
+    // TypeScript has re-orientated the module paths due to a
+    // module inside the 'projectRoot' importing outside the project
+    // root. In these cases, we prefix the resourcePath with ../.
+    // for as many path components found - 1.
+    let resourcePathPrefix = './'
+    if(result.defines.length > 0) {
+      const entry = result.defines[result.defines.length - 1] as Module
+      const split = entry.name.split('/')
+      if(split.length > 1) {
+        resourcePathPrefix = split.slice(1).map(n => '../').join('')
+      }
     }
 
     // Construct Resources from 'resource_names' accumulator.
     const resources = Object.keys(resource_names).map(name => {
-      const [directive, path] = name.split('!')
+      const [directive, moduleName] = name.split('!')
       const dependencies = ["exports"]
       const type = 'resource'
+      const path = `${resourcePathPrefix}${moduleName}`
       return { type, name, path, directive, dependencies } as Resource
     })
-    document.defines.unshift(...resources)
-    return document
+    result.defines.unshift(...resources)
+    return result
   }
 }
 
