@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "removeComments": true,
+    "module": "commonjs",
+    "target": "es3",
+    "downlevelIteration": true,
+    "outDir": "../bin",
+    "lib": ["dom", "esnext"],
+    "strict": true,
+  },
+  "files": ["index.ts"]
+}

@@ -1,2 +1,7 @@
-bin
-package-lock.json
+# build directories
+bin/
+node_modules/
+pack/
+
+# spec assets
+spec/project/out/index.js

@@ -1,10 +1,10 @@
 /*--------------------------------------------------------------------------
 
-typescript-bundle - bundle modular typescript projects for the browser
+typescript-bundle
 
 The MIT License (MIT)
 
-Copyright (c) 2016-2017 Haydn Paterson (sinclair) <haydn.developer@gmail.com>
+Copyright (c) 2019 Haydn Paterson (sinclair) <haydn.developer@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,9 +26,5 @@ THE SOFTWARE.
 
 ---------------------------------------------------------------------------*/
 
-/**
- * preforms a simple delay with the given milliseconds.
- * @param {number} ms the number of milliseconds to delay.
- * @returns {Promise<void>}
- */
-export const delay = (ms: number) => new Promise<void>(resolve => setTimeout(() => resolve(), ms))
+export { BundlerOptions } from './bundler'
+export { Bundler }        from './bundler'

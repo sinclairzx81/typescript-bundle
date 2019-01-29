@@ -1,10 +1,10 @@
 /*--------------------------------------------------------------------------
 
-typescript-bundle - bundle modular typescript projects for the browser
+typescript-bundle
 
 The MIT License (MIT)
 
-Copyright (c) 2016-2017 Haydn Paterson (sinclair) <haydn.developer@gmail.com>
+Copyright (c) 2019 Haydn Paterson (sinclair) <haydn.developer@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,25 +26,35 @@ THE SOFTWARE.
 
 ---------------------------------------------------------------------------*/
 
-import { spawn } from "child_process"
+// ------------------------------------------------------------------------------
+//
+// Transform
+// 
+// Provides code transform services for TypeScripts AMD output. 
+//
+// ------------------------------------------------------------------------------
 
-/**
- * executes a shell command.
- * @param {string} the command to execute.
- * @param {Function} optional logging function.
- * @returns {Promise<number>} the process exit code.
- */
-export const shell = (command: string, log: Function = function() {}) => new Promise<number>((resolve, reject) => {
-  const encoding = "utf8"
-  const windows  = /^win/.test(process.platform) as boolean
-  const proc = spawn (
-    windows ? 'cmd' : 'sh', 
-    [ windows ? '/c':'-c', command ]
-  )
-  proc.stdout.setEncoding(encoding)
-  proc.stderr.setEncoding(encoding)
-  proc.stdout.on("data", data => log(data))
-  proc.stderr.on("data", data => log(data))
-  proc.on("error", error    => reject(error))
-  proc.on("close", exitcode => resolve(exitcode))
-})
+export class Transform {
+
+  /** Transforms the given with the given transformFile. */
+  public static typescriptOutput(transforms: string[], code: string): string {
+    for(const transform of transforms) {
+      const instance = require(transform)
+      if(instance.typescriptOutput) {
+        code = instance.typescriptOutput(code)
+      }
+    }
+    return code
+  }
+
+  /** Transforms the given with the given transformFile. */
+  public static bundleOutput(transforms: string[], code: string): string {
+    for(const transform of transforms) {
+      const instance = require(transform)
+      if(instance.bundleOutput) {
+        code = instance.bundleOutput(code)
+      }
+    }
+    return code
+  }
+}

@@ -1,10 +1,10 @@
 /*--------------------------------------------------------------------------
 
-typescript-bundle - bundle modular typescript projects for the browser
+typescript-bundle
 
 The MIT License (MIT)
 
-Copyright (c) 2016-2017 Haydn Paterson (sinclair) <haydn.developer@gmail.com>
+Copyright (c) 2019 Haydn Paterson (sinclair) <haydn.developer@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,17 +25,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 ---------------------------------------------------------------------------*/
-import { shell }   from "./shell"
 
-/**
- * invokes the typescript compiler with the given command.
- * @param {string} command the typescript shell command.
- * @param {Function} log the logging function.
- * @returns {Promise<void>}
- */
-export const compile = async (command: string, log: Function = function() {}) : Promise<void> => {
-  const exitcode = await shell(command, log)
-  if(exitcode !== 0) {
-    process.exit(exitcode)
-  }
-}
+export { CommandOptions } from './command'
+export { Command }        from './command'

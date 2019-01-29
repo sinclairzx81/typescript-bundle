@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "esnext",
+    "outDir": "../out",
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "baseUrl": ".",
+    "paths": {
+      "@project/*": ["*"]
+    }
+  },
+  "files": [
+    "resources/ext.d.ts",
+    "./index.ts"
+  ]
+}
