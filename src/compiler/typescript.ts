@@ -102,7 +102,7 @@ export class TypeScript {
       const options = this.getCompilerStartOptions(compilerOptions)
       const proc = spawn(options.command, options.options)
       proc.stdout.setEncoding('utf8')
-      proc.stdout.setEncoding('utf8')
+      proc.stderr.setEncoding('utf8')
       proc.stdout.on('data',  (data: string) => diagnosticCallback(data))
       proc.stderr.on('data',  (data: string) => diagnosticCallback(data))
       proc.on('error', error => reject(error))

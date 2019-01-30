@@ -35,7 +35,7 @@ import { writeFileSync }                 from 'fs'
 /** Writes usage information */
 async function info() {
 
-  console.log(`Version 1.0.3
+  console.log(`Version 1.0.4
 
 Examples: tsc-bundle index.ts
           tsc-bundle tsconfig.json
