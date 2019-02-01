@@ -51,6 +51,11 @@ import { basename, extname, resolve, dirname } from 'path'
 
 export type ESTarget = 'unknown' | 'es3' | 'es5' | 'es6' | 'es2015' | 'es2016' | 'es2017' | 'es2018' | 'esnext'
 
+export interface ImportAs {
+  type: 'default' | 'namespace',
+  outer: string
+  inner: string
+}
 export interface CommandOptions {
   commandType: 'unknown' | 'info' | 'bundle' | 'error'
   outFile?:     string
@@ -59,7 +64,7 @@ export interface CommandOptions {
   projectRoot:  string
   inFileType:   'unknown' | 'script' | 'project' | 'unknown'
   exportAs?:    string
-  importAs:     Array<[string, string]>
+  importAs:     ImportAs[]
   transforms:   string[]
   watch:        boolean
   debug:        boolean
@@ -198,10 +203,33 @@ export class Command {
             options.errorText = `expected e.g <global>=<module> pair for --importAs. got '${next}'`
             return options
           }
-          options.importAs.push([match[1], match[2]])
+          const type = 'namespace'
+          const outer = match[1]
+          const inner = match[2]
+          options.importAs.push({ type, outer, inner })
           break
         }
-
+        // IMPORTAS
+        case '--importAsDefault': {
+          const next = args.shift()!
+          if(!next) {
+            options.commandType = 'error'
+            options.errorText = `expected <global>=<module> pair for --importAs.`
+            return options
+          }
+          const pattern = /([a-zA-Z0-9-_$]+)=([a-zA-Z0-9-_$]+)/
+          const match = next.match(pattern)
+          if(!match) {
+            options.commandType = 'error'
+            options.errorText = `expected e.g <global>=<module> pair for --importAs. got '${next}'`
+            return options
+          }
+          const type = 'default'
+          const outer = match[1]
+          const inner = match[2]
+          options.importAs.push({ type, outer, inner })
+          break
+        }
         // TRANSFORM
         case '--transform': {
           const next = args.shift()!

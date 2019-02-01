@@ -42,10 +42,12 @@ import { Loader }    from './loader/loader'
 // ---------------------------------------------------------------------------
 
 export type ESTarget = 'unknown' | 'es3' | 'es5' | 'es6' | 'es2015' | 'es2016' | 'es2017' | 'es2018' | 'esnext'
-export type Outside  = string
-export type Inside   = string
-export type ExportAs = Outside | null | undefined
-export type ImportAs = [Outside, Inside]
+export type ExportAs = string | null | undefined
+export interface ImportAs {
+  type: 'default' | 'namespace',
+  outer: string
+  inner: string
+}
 export interface BundlerOptions {
   esTarget:     ESTarget
   projectRoot:  string

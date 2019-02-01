@@ -50,10 +50,12 @@ export interface LoaderTemplate {
 }
 
 export type ESTarget = 'unknown' | 'es3' | 'es5' | 'es6' | 'es2015' | 'es2016' | 'es2017' | 'es2018' | 'esnext'
-export type Outside  = string
-export type Inside   = string
-export type ExportAs = Outside | null | undefined
-export type ImportAs   = [Outside, Inside]
+export type ExportAs = string | null | undefined
+export interface ImportAs {
+  type: 'default' | 'namespace',
+  outer: string
+  inner: string
+}
 export interface LoaderOptions {
   esTarget: ESTarget
   exportAs: ExportAs
@@ -76,9 +78,11 @@ export class Loader {
       default: return esnext.split(marker).map(n => n.trimRight()) as [string, string]
     }
   }
+  
   private static indent(code: string): string {
     return code.split("\n").map(line => "    " + line).join("\n")
   }
+
   private static resolveExportAs (exportAs: ExportAs) {
     if(exportAs === null || exportAs === undefined) {
       return ''
@@ -89,15 +93,23 @@ export class Loader {
       return `var ${exportAs} = `
     }
   }
+
   private static resolveImportAs(imports: ImportAs[]): string[] {
     return imports.map(importAs => {
-      return [
-        `define("${importAs[1]}", ["exports"], function(exports) {`,
-        `    Object.defineProperty(exports, "__esModule", { value: true });`,
-        `    Object.defineProperty(exports, "default", { value: window['${importAs[0]}'] });`, 
-        `});`
-  
-      ].join('\n')
+      switch(importAs.type) {
+        case 'default': return [
+          `define("${importAs.inner}", ["exports"], function(exports) {`,
+          `    Object.defineProperty(exports, "__esModule", { value: true });`,
+          `    Object.defineProperty(exports, "default", { value: window['${importAs.outer}'] });`, 
+          `});`
+        ].join('\n')
+        case 'namespace': return [
+          `define("${importAs.inner}", ["exports"], function(exports) {`,
+          `    Object.defineProperty(exports, "__cjsModule", { value: true });`,
+          `    Object.defineProperty(exports, "default", { value: window['${importAs.outer}'] });`, 
+          `});`
+        ].join('\n')
+      }
     })
   }
 

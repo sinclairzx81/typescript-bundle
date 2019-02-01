@@ -39,21 +39,21 @@ This tool is offered as is for anyone who finds it useful.
 ```
 $ tsc-bundle script.ts | script.tsx | tsconfig.json
 
-    Examples: tsc-bundle index.ts
-              tsc-bundle tsconfig.json
-              tsc-bundle script.ts --exportAs Foo
-              tsc-bundle index.ts --outFile bundle.js
-              tsc-bundle index.ts --transform script.js
+  Examples: tsc-bundle index.ts
+            tsc-bundle tsconfig.json
+            tsc-bundle script.ts --exportAs Foo
+            tsc-bundle index.ts --outFile bundle.js
+            tsc-bundle index.ts --transform script.js
 
-    Options:
-      --outFile     Outputs the bundle with the give filepath.
-      --target      Sets the ES Target for the bundle.
-      --exportAs    Exports bundle exports as a global variable.
-      --importAs    Imports global variables as modules.
-      --transform   Applies a transform to the bundle.
-      --watch       Starts the compiler in watch mode.
-      --debug       Prints debug information.
-
+  Options:
+    --outFile         Outputs the bundle with the give filepath.
+    --target          Sets the ES Target for the bundle.
+    --exportAs        Exports bundle exports as a global variable.
+    --importAs        Imports global variable as a module (namespace).
+    --importAsDefault Imports global variable as a module (default).
+    --transform       Applies a transform to the bundle.
+    --watch           Starts the compiler in watch mode.
+    --debug           Prints debug information.
 ```
 <a name="Usage"></a>
 ## Usage
@@ -177,36 +177,60 @@ const Foo = require('./script')
 ## ImportAs
 ```
 --importAs GLOBAL=module
+
+--importAsDefault GLOBAL=module
 ```
-Allows global variables (such as those added when loading via CDN) to be added as internal modules.
+Adds global variables (such as those added to a web page when loading scripts via CDN) as internal modules.
 
+### Import React
 ```bash
-# install three.js declaration files.
+# install react declaration files.
 
-$ npm install @types/three
+$ npm install @types/react
+$ npm install @types/react-dom
 ```
 ```TypeScript
 // index.ts
 
-import * as THREE from 'three'
+import * as React    from 'react'
+import * as ReactDOM from 'react-dom'
 ```
 ```bash
 # bundle with --importAs. The convention is GLOBAL_NAME=MODULE_NAME.
 
-$ tsc-bundle index.ts --importAs THREE=three
+$ tsc-bundle index.ts --importAs React=react --importAs ReactDOM=react-dom
 ```
 ```html
-<script src="./three.min.js"></script>
-
+<!-- adds global name React -->
+<script src="./react.js"></script>
+<!-- adds global name ReactDOM -->
+<script src="./react-dom.js"></script>
+<!-- the bundle -->
 <script src="./index.js"></script>
 ```
 It is possible to import as many global names as necessary.
 
-```bash
-# imports react + react-dom if loading from CDN
+### importAs vs importAsDefault
 
-$ tsc-bundle ./index.ts --importAs React=react --importAs ReactDOM=react-dom
+TypeScript-Bundle provides two importAs schemes for importing global variables. The decision to select one over the other is purely down to the import semantics provided by `@types/*` declaration for that library.
+
+#### importAs
 ```
+--importAs THREE=three
+```
+```typescript
+import * as THREE from 'three'
+```
+#### importAsDefault
+```
+--importAsDefault THREE=three
+```
+```typescript
+import THREE from 'three'
+```
+Select the most appropriate based on the library you're importing.
+
+
 <a name="Transforms"></a>
 ## Transforms
 ```

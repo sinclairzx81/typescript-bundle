@@ -36,7 +36,7 @@ import { writeFileSync }                 from 'fs'
 /** Writes usage information */
 async function info() {
 
-  console.log(`Version 1.0.4
+  console.log(`Version 1.0.5
 
 Examples: tsc-bundle index.ts
           tsc-bundle tsconfig.json
@@ -45,13 +45,14 @@ Examples: tsc-bundle index.ts
           tsc-bundle index.ts --transform script.js
 
 Options:
-  --outFile     Outputs the bundle with the give filepath.
-  --target      Sets the ES Target for the bundle.
-  --exportAs    Exports bundle exports as a global variable.
-  --importAs    Imports global variables as modules.
-  --transform   Applies a transform to the bundle.
-  --watch       Starts the compiler in watch mode.
-  --debug       Prints debug information.
+  --outFile         Outputs the bundle with the give filepath.
+  --target          Sets the ES Target for the bundle.
+  --exportAs        Exports bundle exports as a global variable.
+  --importAs        Imports global variable as a module (namespace).
+  --importAsDefault Imports global variable as a module (default).
+  --transform       Applies a transform to the bundle.
+  --watch           Starts the compiler in watch mode.
+  --debug           Prints debug information.
   `)
 }
 
