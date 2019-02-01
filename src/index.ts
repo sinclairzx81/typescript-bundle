@@ -30,6 +30,7 @@ import { TypeScriptConfiguration }       from './compiler/index'
 import { Command, CommandOptions }       from './command/index'
 import { Bundler, BundlerOptions }       from './bundler/index'
 import { TypeScript, TypeScriptOptions } from './compiler/index'
+import { TypeScriptCompilerError }       from './compiler/index'
 import { writeFileSync }                 from 'fs'
 
 /** Writes usage information */
@@ -137,7 +138,7 @@ async function bundle(commandOptions: CommandOptions) {
     })
   } catch(error) {
     fatal(error.message)
-    process.exit(2)
+    process.exit((error as TypeScriptCompilerError).exitcode)
   }
 }
 

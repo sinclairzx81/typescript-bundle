@@ -27,6 +27,7 @@ THE SOFTWARE.
 ---------------------------------------------------------------------------*/
 
 export { TypeScriptConfiguration } from './config'
+export { TypeScriptCompilerError } from './typescript'
 export { TypeScriptOptions }       from './typescript'
 export { TypeScript }              from './typescript'
 export { Watcher }                 from './watcher'

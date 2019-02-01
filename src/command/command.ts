@@ -101,7 +101,7 @@ export class Command {
       options.commandType = 'info'
       return options
     }
-
+    
     // Resolve inputFile and inputFileType
     options.commandType   = 'bundle'
     options.inFile        = resolve(next)
@@ -191,7 +191,7 @@ export class Command {
             options.errorText = `expected <global>=<module> pair for --importAs.`
             return options
           }
-          const pattern = /([a-zA-Z0-9]+)=([a-zA-Z0-9]+)/
+          const pattern = /([a-zA-Z0-9-_$]+)=([a-zA-Z0-9-_$]+)/
           const match = next.match(pattern)
           if(!match) {
             options.commandType = 'error'

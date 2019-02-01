@@ -47,6 +47,12 @@ import { readFileSync } from 'fs'
 //
 // --------------------------------------------------------------------------
 
+export class TypeScriptCompilerError extends Error {
+  constructor(public exitcode: number) {
+    super(`TypeScript ended with exit code ${exitcode}`)
+  }
+}
+
 export type ESTarget = 'unknown' | 'es3' | 'es5' | 'es6' | 'es2015' | 'es2016' | 'es2017' | 'es2018' | 'esnext'
 
 export interface TypeScriptOptions {
@@ -110,7 +116,7 @@ export class TypeScript {
         if (exitcode === 0) {
           return resolve(exitcode)
         }
-        reject(new Error(`exitcode ${exitcode}`))
+        reject(new TypeScriptCompilerError(exitcode))
       })
     })
   }
