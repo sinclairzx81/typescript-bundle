@@ -34,6 +34,7 @@ function get(filePath: string): string {
     const content = readFileSync(filePath, 'utf8')
     const lines = content.split('\n').map(line => {
       const text = line
+        .replace(/\r/g, '')
         .replace(/\\/g, '\\\\"')
         .replace(/"/g, '\\"')
       return `    "${text}"`
