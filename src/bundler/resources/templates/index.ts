@@ -30,4 +30,5 @@ export { asText }   from './text'
 export { asJson }   from './json'
 export { asBase64 } from './base64'
 export { asBuffer } from './buffer'
+export { asCss }    from './css'
 

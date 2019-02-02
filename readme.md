@@ -100,13 +100,14 @@ $ tsc-bundle ./src/tsconfig.json --outFile ./bundle.js
 ```typescript
 import Content from 'text!./file.txt'
 ```
-TypeScript-Bundle can automatically bundle files with a special import scheme similar to WebPack's [ts-loader](https://github.com/TypeStrong/ts-loader). It supports `text`, `json`, `base64`,  and `buffer` directives that inform the bundler how to embed the asset.
+TypeScript-Bundle automatically bundles files with a special import scheme similar to WebPack's [ts-loader](https://github.com/TypeStrong/ts-loader). It supports `text`, `json`, `base64`, `buffer` and `css` directives that inform the bundler how to embed the asset.
 
 ```typescript
 import Text   from 'text!./file.txt'    // as 'string'
 import Base64 from 'base64!./image.png' // as 'string | base64 encoded'
 import Obj    from 'json!./file.json'   // as 'any'
 import Buf    from 'buffer!./file.dat'  // as 'Uint8Array'
+import Css    from 'css!./file.css'     // as 'string | @import concat'
 ```
 
 ### Declarations
@@ -127,6 +128,10 @@ declare module '*.b64' {
 }
 declare module '*.buf' {
  const value: Uint8Array
+  export default value
+}
+declare module '*.css' {
+ const value: string
   export default value
 }
 ```

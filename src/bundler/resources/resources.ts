@@ -30,6 +30,7 @@ import { asBase64 }            from './templates/index'
 import { asBuffer }            from './templates/index'
 import { asJson }              from './templates/index'
 import { asText }              from './templates/index'
+import { asCss }               from './templates/index'
 import { join, dirname }       from 'path'
 
 // ------------------------------------------------------------------------------
@@ -48,7 +49,7 @@ import { join, dirname }       from 'path'
 //
 // ------------------------------------------------------------------------------
 
-type Directive = 'text' | 'json' | 'base64' | 'buffer'
+type Directive = 'text' | 'json' | 'base64' | 'buffer' | 'css'
 type Define = Module | Resource
 interface Module {
   type: 'module'
@@ -86,7 +87,12 @@ class AMDReader {
       const dependencies = unmapped.map(dependency => {
         if(dependency.includes('!')) {
           const split = dependency.split('!').map(n => n.trim())
-          if(split.length === 2 && (split[0] === 'text' || split[0] === 'json' || split[0] === 'base64' || split[0] === 'buffer')) {
+          if(split.length === 2 && 
+              (split[0] === 'text'   || 
+               split[0] === 'json'   || 
+               split[0] === 'base64' || 
+               split[0] === 'buffer' || 
+               split[0] === 'css')) {
             const directive = split[0]
             const absoluteName = join(module_root, split[1])
             const resource = `${directive}!${absoluteName}`
@@ -149,7 +155,7 @@ export class Resources {
     // Rewrites Module Resource Dependencies
     for(const key of Object.keys(result.remaps)) {
       for(const dependency of result.remaps[key]) {
-        const pattern = new RegExp(dependency)
+        const pattern = new RegExp(dependency, 'g')
         code = code.replace(pattern, key)    
       }
     }
@@ -162,6 +168,7 @@ export class Resources {
         case 'json': return asJson(resource.name, path)
         case 'base64': return asBase64(resource.name, path)
         case 'buffer': return asBuffer(resource.name, path)
+        case 'css': return asCss(resource.name, path)
         default: throw Error(`unknown directive '${resource.directive}'`)
       }
     })
