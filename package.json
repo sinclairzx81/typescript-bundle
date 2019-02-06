@@ -1,16 +1,15 @@
 {
   "name": "typescript-bundle",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": " A zero configuration bundling tool for TypeScript.",
   "scripts": {
-    "clean": "node tasks clean",
-    "amd-loaders": "node tasks amd_loaders",
-    "build": "node tasks build",
-    "pack": "node tasks pack",
-    "watch-spec": "node tasks watch_spec",
-    "watch-spec-out": "node tasks watch_spec_out",
-    "install-cli": "node tasks install_cli",
-    "uninstall-cli": "node tasks uninstall_cli"
+    "clean": "smoke-task clean",
+    "amd-loaders": "npm install && node tasks amd_loaders",
+    "build": "npm install && smoke-task build",
+    "pack": "npm install && smoke-task pack",
+    "spec": "npm install && smoke-task spec",
+    "install-cli": "npm install && smoke-task install_cli",
+    "uninstall-cli": "npm install && smoke-task uninstall_cli"
   },
   "bin": {
     "tsc-bundle": "./tsc-bundle"
@@ -27,13 +26,9 @@
   "author": "sinclairzx81",
   "license": "MIT",
   "devDependencies": {
-    "@types/chai": "^4.1.3",
-    "@types/mocha": "^5.2.0",
     "@types/node": "^8.0.7",
-    "chai": "^4.1.2",
-    "fsrun": "^0.9.4",
-    "mocha": "^5.2.0",
     "shx": "^0.2.2",
+    "smoke-task": "^1.0.1",
     "typescript": "^3.2.4"
   }
 }

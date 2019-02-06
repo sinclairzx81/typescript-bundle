@@ -26,124 +26,51 @@ THE SOFTWARE.
 
 ---------------------------------------------------------------------------*/
 
-//--------------------------------------------------------------------------
-//
-// helper functions
-//
-//--------------------------------------------------------------------------
-
-function shell (command) {
-  return new Promise(resolve => {
-    command = command.split('\n').join(' ').split(' ').filter(n => n.length > 0).join(' ')
-    const { spawn } = require('child_process')
-    const windows = /^win/.test(process.platform)
-    console.log(`\x1b[32m${command}\x1b[0m` )
-    const ls      = spawn(windows ? 'cmd' : 'sh', [windows ? '/c' : '-c', command] )
-    ls.stdout.pipe(process.stdout)
-    ls.stderr.pipe(process.stderr)
-    ls.on('close', (code) => resolve(code))
-  })
-}
-async function cli(args, tasks) {
-  const task = (args.length === 3) ? args[2] : 'none'
-  const func = (tasks[task]) ? tasks[task] : () => {
-    console.log('tasks:')
-    Object.keys(tasks).forEach(task => console.log(` - ${task}`))
-  }; await func()
-}
-
-//--------------------------------------------------------------------------
-//
-// compiler commands
-//
-//--------------------------------------------------------------------------
-
-const BUILD     = () => `tsc --project ./src/tsconfig.json`
-const BUILD_AMD = (target) => {
+async function build_amd_template(target) {
   const template = `./src/bundler/loader/templates/template.ts`
   const outFile  = `./src/bundler/loader/templates/${target}.ts`
   const backtick = "\\\`"
-  return `
+  await shell(`
     tsc ${template} --outFile ${outFile} --target ${target} --removeComments
     && echo "export default ${backtick}""$(cat ${outFile})"${backtick} > ${outFile}
-  `
+  `)
 }
 
-
-//--------------------------------------------------------------------------
-//
-// tasks
-//
-//--------------------------------------------------------------------------
-
-async function clean() {
-  await shell('shx rm -rf ./spec/project/out/index.js')
-  await shell('shx rm -rf ./bin')
-  await shell('shx rm -rf ./pack')
+export async function clean() {
+  await shell('shx rm -rf ./output')
   await shell('shx rm -rf ./node_modules')
 }
 
-async function spec () {
-  await shell('npm install')
-  await shell(`${SPEC()}`)
-  await shell('mocha ./spec.js')
-}
-
-async function amd_loaders() {
+export async function amd_loaders() {
   const targets = ['es3', 'es5', 'es6', 'es2015', 'es2016', 'es2017', 'es2018', 'esnext']
-  await Promise.all(targets.map(target => shell(BUILD_AMD(target))))
+  const builds = targets.map(target => build_amd_template(target))
+  await Promise.all(builds)
 }
 
-
-
-async function build () {
-  await shell('npm install')
-  await shell(`${BUILD()}`)
+export async function build () {
+  await shell('tsc --project ./src/tsconfig.json --outDir ./output/bin')
 }
 
-async function pack () {
+export async function pack () {
   await build()
-  await shell('node ./bin/index.js ./src/tsconfig.json --outFile ./pack/index.js --debug')
-  await shell('shx mkdir -p ./pack')
-  await shell('shx cp ./package.json ./pack')
-  await shell('shx cp ./readme.md ./pack')
-  await shell('shx cp ./license ./pack')
-  await shell('shx cp ./src/tsc-bundle ./pack')
+  await shell('node ./output/bin/index.js ./src/tsconfig.json --outFile ./output/pack/index.js')
+  await shell('shx cp ./package.json   ./output/pack')
+  await shell('shx cp ./readme.md      ./output/pack')
+  await shell('shx cp ./license        ./output/pack')
+  await shell('shx cp ./src/tsc-bundle ./output/pack')
+  await shell('cd output/pack && npm pack')
 }
 
-async function watch_spec() {
-  await shell('npm install')
-  await shell(`${BUILD()}`)
-  await Promise.all([
-    shell(`${BUILD()} --watch`),
-    shell('fsrun ./bin/ [node ./bin/index.js ./spec/project/in/tsconfig.json]')
-  ])
-}
-async function watch_spec_out () {
-  await shell('fsrun ./spec/project/out/index.js [node ./spec/project/out/index.js]')
-}
-async function install_cli () {
+export async function install_cli () {
   await pack()
-  await shell('cd ./pack && npm install -g')
+  await shell('cd ./output/pack && npm install ./*.tgz -g')
 }
 
-async function uninstall_cli () {
+export async function spec() {
   await pack()
-  await shell('cd ./pack && npm uninstall -g')
+  await shell('node ./output/pack ./spec/tsconfig.json --outFile ./output/spec/index.js')
+  await shell('node ./output/spec')
 }
 
-//--------------------------------------------------------------------------
-//
-// cli
-//
-//--------------------------------------------------------------------------
-cli(process.argv, {
-  clean,
-  amd_loaders,
-  build,
-  pack,
-  watch_spec,
-  watch_spec_out,
-  install_cli,
-  uninstall_cli
-}).catch(console.log)
+
+

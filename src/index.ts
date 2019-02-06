@@ -35,14 +35,15 @@ import { writeFileSync }                 from 'fs'
 
 /** Writes usage information */
 async function info() {
+  const green  = '\x1b[32m'
+  const esc    = '\x1b[0m'
+  console.log(`Version 1.0.8
 
-  console.log(`Version 1.0.7
-
-Examples: tsc-bundle index.ts
-          tsc-bundle tsconfig.json
-          tsc-bundle script.ts --exportAs Foo
-          tsc-bundle index.ts --outFile bundle.js
-          tsc-bundle index.ts --transform script.js
+Examples: ${green}tsc-bundle${esc} index.ts
+          ${green}tsc-bundle${esc} tsconfig.json
+          ${green}tsc-bundle${esc} script.ts --exportAs Foo
+          ${green}tsc-bundle${esc} index.ts --outFile bundle.js
+          ${green}tsc-bundle${esc} index.ts --transform script.js
 
 Options:
   --outFile         Outputs the bundle with the give filepath.
@@ -120,17 +121,13 @@ function getOptions(commandOptions: CommandOptions): [TypeScriptOptions, Bundler
 async function bundle(commandOptions: CommandOptions) {
   const [typescriptOptions, bundlerOptions] = getOptions(commandOptions)
   if(commandOptions.debug) {
-    console.log('--------------------------------------------')
     console.log(); console.log('COMMAND',    commandOptions)
-    console.log('--------------------------------------------')
     console.log(); console.log("TYPESCRIPT", typescriptOptions)
-    console.log('--------------------------------------------')
     console.log(); console.log("BUNDLER",    bundlerOptions)
-    console.log('--------------------------------------------')
   }
   try {
     await TypeScript.compile(typescriptOptions, 
-      diagnostic => console.log(diagnostic), 
+      diagnostic => process.stdout.write(diagnostic), 
       content => {
         if(Bundler.shouldBundle(content)) {
           const bundle = Bundler.bundle(content, bundlerOptions)
