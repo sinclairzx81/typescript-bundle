@@ -47,11 +47,11 @@ export async function amd_loaders() {
   await Promise.all(builds)
 }
 
-export async function build () {
+export async function build() {
   await shell('tsc --project ./src/tsconfig.json --outDir ./output/bin')
 }
 
-export async function pack () {
+export async function pack() {
   await build()
   await shell('node ./output/bin/index.js ./src/tsconfig.json --outFile ./output/pack/index.js')
   await shell('shx cp ./package.json   ./output/pack')
@@ -61,16 +61,13 @@ export async function pack () {
   await shell('cd output/pack && npm pack')
 }
 
-export async function install_cli () {
-  await pack()
-  await shell('cd ./output/pack && npm install ./*.tgz -g')
-}
-
 export async function spec() {
   await pack()
   await shell('node ./output/pack ./spec/tsconfig.json --outFile ./output/spec/index.js')
   await shell('node ./output/spec')
 }
 
-
-
+export async function install_cli () {
+  await pack()
+  await shell('cd ./output/pack && npm install ./*.tgz -g')
+}

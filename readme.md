@@ -272,12 +272,10 @@ $ tsc-bundle ./index.ts --transform ./a.js --transform ./b.js --transform ./c.js
 The following tasks are provided by this project.
 
 ```bash
-$ npm run clean          # cleans this project.
-$ npm run es_loaders     # rebuilds es loader templates. 
-$ npm run build          # builds the bundler.
-$ npm run pack           # packs the bundler.
-$ npm run watch-spec     # compiles the spec project on edits.
-$ npm run watch-spec-out # executes the spec project on edits.
-$ npm run install-cli    # installs the bundler cli globally.
-$ npm run uninstall-cli  # uninstalls the bundler cli globally.
+$ npm run clean       # cleans this project.
+$ npm run es_loaders  # rebuilds es loader templates. 
+$ npm run build       # builds the bundler.
+$ npm run pack        # packs the bundler.
+$ npm run spec        # builds and runs the spec project.
+$ npm run install-cli # installs the bundler cli globally.
 ```
