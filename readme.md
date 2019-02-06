@@ -5,6 +5,8 @@ A zero configuration bundling tool for TypeScript.
 
 ![logo](./docs/images/logo-small.png)
 
+[![Build Status](https://travis-ci.org/sinclairzx81/typescript-bundle.svg?branch=master)](https://travis-ci.org/sinclairzx81/typescript-bundle)
+
 ```bash
 $ npm install typescript-bundle -g
 ```
