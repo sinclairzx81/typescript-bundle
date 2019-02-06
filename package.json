@@ -8,6 +8,7 @@
     "build": "npm install && smoke-task build",
     "pack": "npm install && smoke-task pack",
     "spec": "npm install && smoke-task spec",
+    "test": "npm run spec",
     "install-cli": "npm install && smoke-task install_cli",
     "uninstall-cli": "npm install && smoke-task uninstall_cli"
   },
