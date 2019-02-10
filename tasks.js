@@ -71,3 +71,7 @@ export async function install_cli () {
   await pack()
   await shell('cd ./output/pack && npm install ./*.tgz -g')
 }
+
+export async function watch() {
+  await shell(`smoke-run ./src/{**,.}/** -- npx smoke-task install_cli`)
+}

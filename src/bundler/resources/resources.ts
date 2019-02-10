@@ -106,7 +106,8 @@ class AMDReader {
         }
         return dependency
       })
-      const define = { type, name, dependencies: dependencies }
+      
+      const define = { type, name, dependencies }
       result.defines.push(define as Define)
     }
     
@@ -134,6 +135,7 @@ class AMDReader {
       const path = `${resourcePathPrefix}${moduleName}`
       return { type, name, path, directive, dependencies } as Resource
     })
+
     result.defines.unshift(...resources)
     return result
   }
@@ -157,7 +159,15 @@ export class Resources {
     // Rewrites Module Resource Dependencies
     for(const key of Object.keys(result.remaps)) {
       for(const dependency of result.remaps[key]) {
-        const pattern = new RegExp(dependency, 'g')
+
+        // note: there is a subtle thing going on here
+        // where the remap is stepping through imports
+        // in 'order of discovery' and the rewriting of
+        // module imports works by replacing in 'order
+        // of discovery'. Need to consider a more 
+        // clear cut, obvious way of handling this
+        // module rewrite.
+        const pattern = new RegExp(dependency)
         code = code.replace(pattern, key)    
       }
     }
