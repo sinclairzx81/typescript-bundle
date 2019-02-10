@@ -26,6 +26,7 @@ THE SOFTWARE.
 
 ---------------------------------------------------------------------------*/
 
+import { asDirectory }         from './templates/index'
 import { asBase64 }            from './templates/index'
 import { asBuffer }            from './templates/index'
 import { asJson }              from './templates/index'
@@ -49,7 +50,7 @@ import { join, dirname }       from 'path'
 //
 // ------------------------------------------------------------------------------
 
-type Directive = 'text' | 'json' | 'base64' | 'buffer' | 'css'
+type Directive =  'directory' | 'text' | 'json' | 'base64' | 'buffer' | 'css'
 type Define = Module | Resource
 interface Module {
   type: 'module'
@@ -88,10 +89,11 @@ class AMDReader {
         if(dependency.includes('!')) {
           const split = dependency.split('!').map(n => n.trim())
           if(split.length === 2 && 
-              (split[0] === 'text'   || 
-               split[0] === 'json'   || 
-               split[0] === 'base64' || 
-               split[0] === 'buffer' || 
+              (split[0] === 'directory' || 
+               split[0] === 'text'      ||
+               split[0] === 'json'      || 
+               split[0] === 'base64'    || 
+               split[0] === 'buffer'    ||
                split[0] === 'css')) {
             const directive = split[0]
             const absoluteName = join(module_root, split[1])
@@ -164,11 +166,12 @@ export class Resources {
     const fragments = resources.map(resource => {
       const path = join(basePath, resource.path)
       switch(resource.directive) {
-        case 'text': return asText(resource.name, path)
-        case 'json': return asJson(resource.name, path)
-        case 'base64': return asBase64(resource.name, path)
-        case 'buffer': return asBuffer(resource.name, path)
-        case 'css': return asCss(resource.name, path)
+        case 'directory': return asDirectory(resource.name, path)
+        case 'text':      return asText(resource.name, path)
+        case 'json':      return asJson(resource.name, path)
+        case 'base64':    return asBase64(resource.name, path)
+        case 'buffer':    return asBuffer(resource.name, path)
+        case 'css':       return asCss(resource.name, path)
         default: throw Error(`unknown directive '${resource.directive}'`)
       }
     })
