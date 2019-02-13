@@ -26,6 +26,8 @@ THE SOFTWARE.
 
 ---------------------------------------------------------------------------*/
 
+const package = require(`${process.cwd()}/package.json`)
+
 async function build_amd_template(target) {
   const template = `./src/bundler/loader/templates/template.ts`
   const outFile  = `./src/bundler/loader/templates/${target}.ts`
@@ -69,7 +71,7 @@ export async function spec() {
 
 export async function install_cli () {
   await pack()
-  await shell('cd ./output/pack && npm install ./typescript-bundle-1.0.10.tgz -g')
+  await shell(`cd ./output/pack && npm install ./typescript-bundle-${package.version}.tgz -g`)
 }
 
 export async function watch() {
