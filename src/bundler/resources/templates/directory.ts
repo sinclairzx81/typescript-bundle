@@ -26,7 +26,7 @@ THE SOFTWARE.
 
 ---------------------------------------------------------------------------*/
 
-import { resolve, join } from 'path'
+import { resolve, join, isAbsolute, normalize } from 'path'
 import { readdirSync, statSync, readFileSync, existsSync } from 'fs'
 import { render } from './render'
 
@@ -52,34 +52,45 @@ function flatMap<T>(array: T[][]): T[] {
   return buffer
 }
 
-function readFiles(rootPath: string, directoryPath: string): FileEntry[] {
+function fixWindowsPath(path: string): string {
+  return path.replace(new RegExp(/\\/g), '/')
+}
+
+/** Reads file entries, returning the absolute path + file data encoded in base64 */
+function readFileEntries(directoryPath: string): FileEntry[] {
   if (!existsSync(directoryPath) || !statSync(directoryPath).isDirectory()) {
     return []
   }
+
+  // reads inner contents, map to absolute if nessasary.
   const contents = readdirSync(directoryPath)
+  .map(path => !isAbsolute(path) ? join(directoryPath, path) : path)
+  .map(path => fixWindowsPath(path))
+
   return [
     ...flatMap(
       contents
-        .map(path => join(directoryPath, path))
         .filter(path => statSync(path).isDirectory())
-        .map(path => readFiles(rootPath, path))
+        .map(path => readFileEntries(path))
     ),
     ...contents
-      .map(path => join(directoryPath, path))
       .filter(path => statSync(path).isFile())
       .map(path => {
         const data = readFileSync(path).toString('base64')
-        const trim = path.replace(rootPath + '/', '')
-        return { path: trim, data }
+        return { path, data }
       })
   ]
 }
 
 export function packDirectory(directoryPath: string): {[path: string]: string } {
-  const absolutePath = resolve(directoryPath)
-  const entries = readFiles(absolutePath, absolutePath)
-  return entries.reduce((acc: {[path: string]: string }, c) => {
-    acc[c.path] = c.data
+  const absoluteDirectoryPath = fixWindowsPath(resolve(directoryPath))
+  const entries = readFileEntries(absoluteDirectoryPath)
+  return entries.reduce((acc: {[path: string]: string }, entry) => {
+    // note: because file entries are given in absolute form, we
+    // need to truncate the beginning of the path to produce
+    // the object key.
+    const key = entry.path.replace(absoluteDirectoryPath + '/', '')
+    acc[key] = entry.data
     return acc
   }, {})
 }

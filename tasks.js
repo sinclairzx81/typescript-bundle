@@ -69,7 +69,7 @@ export async function spec() {
 
 export async function install_cli () {
   await pack()
-  await shell('cd ./output/pack && npm install ./*.tgz -g')
+  await shell('cd ./output/pack && npm install ./typescript-bundle-1.0.10.tgz -g')
 }
 
 export async function watch() {
