@@ -51,6 +51,7 @@ export interface ImportAs {
 export interface BundlerOptions {
   esTarget:     ESTarget
   projectRoot:  string
+  entryPoint?:  string
   exportAs?:    ExportAs,
   importAs?:    ImportAs[],
   transforms:   string[]
@@ -59,7 +60,7 @@ export interface BundlerOptions {
 export class Bundler {
   public static shouldBundle(code: string) {
     // check for marker - written in Loader
-    return code.includes("'marker:" + "entry';") === false
+    return code.includes("'marker:" + "resolver';") === false
   }
   public static bundle(code: string, options: BundlerOptions): string {
     options.exportAs = options.exportAs || null
@@ -68,9 +69,10 @@ export class Bundler {
     code = Transform.typescriptOutput(options.transforms, code)
     code = Resources.transform(options.projectRoot, code)
     code = Loader.transform({
-      esTarget: options.esTarget,
-      importAs: options.importAs,
-      exportAs: options.exportAs
+      entryPoint: options.entryPoint,
+      esTarget:   options.esTarget,
+      importAs:   options.importAs,
+      exportAs:   options.exportAs
     }, code)
     return Transform.bundleOutput(options.transforms, code)
   }

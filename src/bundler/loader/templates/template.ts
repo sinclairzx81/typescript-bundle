@@ -139,7 +139,7 @@ interface Instance {
           }
           catch {
 
-            throw Error(['module ', name, ' not found.'].join(''));
+            throw Error(['module "', name, '" not found.'].join(''));
           }
       };
       
@@ -200,7 +200,7 @@ interface Instance {
   // ------------------------------------------------------------
   if (entry[0] !== null) {
 
-    return resolve(entry[0])
+    return resolve("marker:entry")
   }
 
 })();

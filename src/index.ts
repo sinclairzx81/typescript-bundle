@@ -51,6 +51,7 @@ Options:
   --exportAs        Exports bundle exports as a global variable.
   --importAs        Imports global variable as a module (namespace).
   --importAsDefault Imports global variable as a module (default).
+  --entryPoint      Overrides the default entry point for the bundle.
   --transform       Applies a transform to the bundle.
   --watch           Starts the compiler in watch mode.
   --debug           Prints debug information.
@@ -76,6 +77,7 @@ function getOptions(commandOptions: CommandOptions): [TypeScriptOptions, Bundler
     projectRoot:  '',
     importAs:     [],
     exportAs:     null,
+    entryPoint:   undefined,
     transforms:   []
   }
 
@@ -113,6 +115,7 @@ function getOptions(commandOptions: CommandOptions): [TypeScriptOptions, Bundler
   bundlerOptions.projectRoot = commandOptions.projectRoot
   bundlerOptions.exportAs     = commandOptions.exportAs
   bundlerOptions.importAs     = commandOptions.importAs
+  bundlerOptions.entryPoint  =  commandOptions.entryPoint
   bundlerOptions.transforms   = commandOptions.transforms
   return [typescriptOptions, bundlerOptions]
 }

@@ -25,7 +25,7 @@ export default `(function () {
                     Object.defineProperty(exports, "default", { value: require(name) });
                 }
                 catch (_a) {
-                    throw Error(['module ', name, ' not found.'].join(''));
+                    throw Error(['module "', name, '" not found.'].join(''));
                 }
             };
             return { dependencies: dependencies, factory: factory };
@@ -48,6 +48,6 @@ export default `(function () {
         return instances[name];
     }
     if (entry[0] !== null) {
-        return resolve(entry[0]);
+        return resolve("marker:entry");
     }
 })();`

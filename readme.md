@@ -31,13 +31,15 @@ This tool is offered as is for anyone who finds it useful.
 - [Options](#Options)
 - [Usage](#Usage)
 - [Assets](#Assets)
-- [ExportAs](#exportAs)
-- [ImportAs](#importAs)
+- [ExportAs](#ExportAs)
+- [ImportAs](#ImportAs)
+- [EntryPoint](#EntryPoint)
 - [Transforms](#Transforms)
 - [Tasks](#Tasks)
 
 <a name="Options"></a>
 ## Options
+
 ```
 $ tsc-bundle script.ts | script.tsx | tsconfig.json
 
@@ -53,10 +55,13 @@ $ tsc-bundle script.ts | script.tsx | tsconfig.json
     --exportAs        Exports bundle exports as a global variable.
     --importAs        Imports global variable as a module (namespace).
     --importAsDefault Imports global variable as a module (default).
+    --entryPoint      Overrides the default entry point for the bundle.
     --transform       Applies a transform to the bundle.
     --watch           Starts the compiler in watch mode.
     --debug           Prints debug information.
+
 ```
+
 <a name="Usage"></a>
 ## Usage
 
@@ -237,6 +242,14 @@ import THREE from 'three'
 ```
 Select the most appropriate based on the library you're importing.
 
+<a name="EntryPoint"></a>
+## EntryPoint
+
+```
+--entryPoint index2
+```
+
+Will override the default entry point for the bundle. By default, the last module within the bundle is treated as the default entry point and will be evaluated first. If this is undesirable, the `--entryPoint` option allows for the selection of any other module located within the bundle to be evaluated first. Useful when compiling with `glob` patterns such as `"include": [ "src/**/*" ]`.
 
 <a name="Transforms"></a>
 ## Transforms

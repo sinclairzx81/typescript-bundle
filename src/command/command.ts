@@ -65,6 +65,7 @@ export interface CommandOptions {
   inFileType:   'unknown' | 'script' | 'project' | 'unknown'
   exportAs?:    string
   importAs:     ImportAs[]
+  entryPoint?:  string
   transforms:   string[]
   watch:        boolean
   debug:        boolean
@@ -94,6 +95,7 @@ export class Command {
       inFileType:    'unknown',
       exportAs:      undefined,
       importAs:      [],
+      entryPoint:    undefined,
       transforms:    [],
       watch:         false,
       debug:         false,
@@ -209,7 +211,7 @@ export class Command {
           options.importAs.push({ type, outer, inner })
           break
         }
-        // IMPORTAS
+        // IMPORTASDEEFAULT
         case '--importAsDefault': {
           const next = args.shift()!
           if(!next) {
@@ -228,6 +230,17 @@ export class Command {
           const outer = match[1]
           const inner = match[2]
           options.importAs.push({ type, outer, inner })
+          break
+        }
+        // ENTRYPOINT
+        case '--entryPoint': {
+          const next = args.shift()!
+          if(!next) {
+            options.commandType = 'error'
+            options.errorText = `expected module name for --entryPoint`
+            return options
+          }
+          options.entryPoint = next
           break
         }
         // TRANSFORM

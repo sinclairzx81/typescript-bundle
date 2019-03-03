@@ -57,9 +57,10 @@ export interface ImportAs {
   inner: string
 }
 export interface LoaderOptions {
-  esTarget: ESTarget
-  exportAs: ExportAs
-  importAs: ImportAs[]
+  entryPoint?: string
+  esTarget:    ESTarget
+  exportAs:    ExportAs
+  importAs:    ImportAs[]
 }
 
 export class Loader {
@@ -113,14 +114,20 @@ export class Loader {
     })
   }
 
+  public static resolveEntryModule(tfooter: string, entryPoint?: string): string {
+    return (entryPoint !== undefined)
+      ? tfooter.replace('"marker:entry"', `"${entryPoint}"`)
+      : tfooter.replace('"marker:entry"', `entry[0]`)
+  }
+
   public static transform(options: LoaderOptions, code: string): string {
     const [theader, tfooter] = this.getLoaderTemplate(options.esTarget)
     const texports = this.resolveExportAs(options.exportAs)
     const timports = this.resolveImportAs(options.importAs)
     const header = `${texports}${theader}`
-    const marker = "'marker:" + "entry';"
+    const marker = "'marker:" + "resolver';"
     const body   = this.indent([...timports, code, marker].join('\n'))
-    const footer = tfooter
+    const footer = this.resolveEntryModule(tfooter, options.entryPoint)
     return [header, body, footer].join('\n')
   }
 }
