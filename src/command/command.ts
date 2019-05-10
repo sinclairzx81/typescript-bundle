@@ -174,7 +174,7 @@ export class Command {
             options.errorText = `expected expected target 'es3' | 'es5' | 'es6' | 'es2015' | 'es2016' | 'es2017' | 'es2018' | 'esnext'`
             return options
           }
-          options.outFile = resolve(next.toLowerCase())
+          options.esTarget = next.toLowerCase() as ESTarget
           break
         }
 
