@@ -37,7 +37,7 @@ import { writeFileSync }                 from 'fs'
 async function info() {
   const green  = '\x1b[32m'
   const esc    = '\x1b[0m'
-  console.log(`Version 1.0.11
+  console.log(`Version 1.0.15
 
 Examples: ${green}tsc-bundle${esc} index.ts
           ${green}tsc-bundle${esc} tsconfig.json

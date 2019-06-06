@@ -1,6 +1,6 @@
 {
   "name": "typescript-bundle",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "description": " A zero configuration bundling tool for TypeScript.",
   "scripts": {
     "clean": "smoke-task clean",
@@ -30,7 +30,7 @@
   "devDependencies": {
     "@types/node": "^8.0.7",
     "shx": "^0.2.2",
-    "smoke-task": "^1.0.2",
+    "smoke-task": "^1.0.6",
     "smoke-run": "^1.0.0",
     "typescript": "^3.3.3"
   }

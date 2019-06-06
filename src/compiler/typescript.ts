@@ -28,7 +28,6 @@ THE SOFTWARE.
 
 import { Watcher }      from './watcher'
 import { spawn }        from 'child_process'
-import { readFileSync } from 'fs'
 
 // --------------------------------------------------------------------------
 //
@@ -128,23 +127,23 @@ export class TypeScript {
   }{
     const buffer = ['tsc']
     if(options.type === 'project') {
-      buffer.push(`--project ${options.inFile}`)
+      buffer.push(...[`--project`, `${options.inFile}`])
     } else {
       buffer.push(`${options.inFile}`)
     }
-    buffer.push(`--outFile ${options.outFile}`)
-    buffer.push(`--target ${options.esTarget}`)
-    buffer.push(`--module amd`)
+    buffer.push(...[`--outFile`, `${options.outFile}`])
+    buffer.push(...[`--target`, `${options.esTarget}`])
+    buffer.push(...[`--module`, `amd`])
     if(options.watch) {
       // buffer.push('--preserveWatchOutput')
       buffer.push('--watch')
     }
-    return this.getStartOptions(buffer.join(' '))
+    return this.getStartOptions(buffer)
   }
 
   /** Resolves the spawn() options based on host operating system. */
   private static getStartOptions(
-    compilerstring: string
+    compilerOptions: string[]
   ): {
     command: string
     options: string[]
@@ -152,12 +151,12 @@ export class TypeScript {
     if (/^win/.test(process.platform)) {
        // windows
       const command = 'cmd'
-      const options = ['/c', compilerstring]
+      const options = ['/c', ...compilerOptions]
       return { command, options }
     } else {
       // linux | osx
       const command = 'sh'
-      const options = ['-c', compilerstring]
+      const options = ['-c', ...compilerOptions]
       return { command, options }
     }
   }
