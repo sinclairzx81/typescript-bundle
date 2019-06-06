@@ -138,6 +138,7 @@ export class TypeScript {
       // buffer.push('--preserveWatchOutput')
       buffer.push('--watch')
     }
+
     return this.getStartOptions(buffer)
   }
 
@@ -156,7 +157,8 @@ export class TypeScript {
     } else {
       // linux | osx
       const command = 'sh'
-      const options = ['-c', ...compilerOptions]
+      // todo: may have issues on linux for paths with spaces.
+      const options = ['-c', compilerOptions.join(' ')] 
       return { command, options }
     }
   }
