@@ -1,7 +1,7 @@
 
 # TypeScript-Bundle
 
-A zero configuration bundling tool for TypeScript.
+A bundling tool for TypeScript.
 
 ![logo](./docs/images/logo-small.png)
 
