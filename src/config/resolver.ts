@@ -45,7 +45,7 @@ export class TsConfigResolver {
     }
     
     public resolve(tsConfigPath: string): TsConfigProperties {
-        if (!existsSync(tsConfigPath)) throw Error(`${tsConfigPath} does not exist`)
+        if (!existsSync(tsConfigPath)) throw Error(`Cannot read file '${tsConfigPath}'.`)
         const current = this.parse(readFileSync(tsConfigPath, 'utf-8')) as TsConfigProperties
         if(current.extends) {
             const parent = this.resolve(join(dirname(tsConfigPath), current.extends))

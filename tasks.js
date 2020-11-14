@@ -26,8 +26,6 @@ THE SOFTWARE.
 
 ---------------------------------------------------------------------------*/
 
-const package = require(`${process.cwd()}/package.json`)
-
 async function build_amd_template(target) {
   const template = `./src/bundler/loader/templates/template.ts`
   const outFile  = `./src/bundler/loader/templates/${target}.ts`
@@ -35,12 +33,11 @@ async function build_amd_template(target) {
   await shell(`
     tsc ${template} --outFile ${outFile} --target ${target} --removeComments
     && echo "export default ${backtick}""$(cat ${outFile})"${backtick} > ${outFile}
-  `)
+  `).exec()
 }
 
 export async function clean() {
-  await shell('shx rm -rf ./output')
-  await shell('shx rm -rf ./node_modules')
+  await folder('target').delete().exec()
 }
 
 export async function amd_loaders() {
@@ -49,31 +46,33 @@ export async function amd_loaders() {
   await Promise.all(builds)
 }
 
-export async function build() {
-  await shell('tsc --project ./src/tsconfig.json --outDir ./output/bin')
+export async function build(target = 'target') {
+  await shell(`tsc --project src/tsconfig.json --outDir ${target}/bin`).exec()
 }
 
-export async function pack() {
+export async function pack(target = 'target') {
   await build()
-  await shell('node ./output/bin/index.js ./src/tsconfig.json --outFile ./output/pack/index.js')
-  await shell('shx cp ./package.json   ./output/pack')
-  await shell('shx cp ./readme.md      ./output/pack')
-  await shell('shx cp ./license        ./output/pack')
-  await shell('shx cp ./src/tsc-bundle ./output/pack')
-  await shell('cd output/pack && npm pack')
+  await shell(`node ${target}/bin/index.js ./src/tsconfig.json --outFile ${target}/pack/index.js`).exec()
+  await folder(`${target}/pack`).add('package.json').exec()
+  await folder(`${target}/pack`).add('readme.md').exec()
+  await folder(`${target}/pack`).add('license').exec()
+  await folder(`${target}/pack`).add('src/tsc-bundle').exec()
+  await shell(`cd ${target}/pack && npm pack`).exec()
 }
 
-export async function spec() {
+export async function spec(target = 'target') {
   await pack()
-  await shell('node ./output/pack ./spec/tsconfig.json --outFile ./output/spec/index.js')
-  await shell('node ./output/spec')
+  await shell(`node ${target}/pack ./spec/tsconfig.json --outFile ${target}/spec/index.js`).exec()
+  await shell(`node ${target}/spec`).exec()
 }
 
-export async function install_cli () {
-  await pack()
-  await shell(`cd ./output/pack && npm install ./typescript-bundle-${package.version}.tgz -g`)
+export async function install_cli (target = 'target') {
+  await pack(target)
+  const package = JSON.parse(await file(`package.json`).read('utf-8'))
+  const packfile = `typescript-bundle-${package.version}.tgz`
+  await shell(`cd ${target}/pack && npm install ${packfile} -g`).exec()
 }
 
-export async function watch() {
-  await shell(`smoke-run ./src/{**,.}/** -- npx smoke-task install_cli`)
+export async function uninstall_cli (target = 'target') {
+  await shell('npm uninstall typescript-bundle -g').exec()
 }

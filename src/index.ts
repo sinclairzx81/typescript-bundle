@@ -37,7 +37,7 @@ import { writeFileSync }                 from 'fs'
 async function info() {
   const green  = '\x1b[32m'
   const esc    = '\x1b[0m'
-  console.log(`Version 1.0.16
+  console.log(`Version 1.0.17
 
 Examples: ${green}tsc-bundle${esc} index.ts
           ${green}tsc-bundle${esc} tsconfig.json
@@ -59,65 +59,70 @@ Options:
 }
 
 /** Writes error messages */
-async function fatal(errorText: string) {
+function writeError(errorText: string) {
   console.log(errorText)
 }
 
 /** Resolves compiler and bundler options. */
 function getOptions(commandOptions: CommandOptions): [TypeScriptOptions, BundlerOptions]  {
-  const typescriptOptions: TypeScriptOptions = {
-    type:         'script',
-    esTarget:     'es3',
-    inFile:       '',
-    outFile:      '',
-    watch:        false
-  }
-  const bundlerOptions: BundlerOptions = {
-    esTarget:     'es3',
-    projectRoot:  '',
-    importAs:     [],
-    exportAs:     null,
-    entryPoint:   undefined,
-    transforms:   []
-  }
+    try {
+      const typescriptOptions: TypeScriptOptions = {
+        type:         'script',
+        esTarget:     'es3',
+        inFile:       '',
+        outFile:      '',
+        watch:        false
+      }
+      const bundlerOptions: BundlerOptions = {
+        esTarget:     'es3',
+        projectRoot:  '',
+        importAs:     [],
+        exportAs:     null,
+        entryPoint:   undefined,
+        transforms:   []
+      }
 
-  // Get 'defaults' from 'inFile | inFileType'
-  if(commandOptions.inFileType === 'project') {
-    const defaults = TypeScriptConfiguration.resolveTargetAndOutFileFromTsConfig(commandOptions.inFile)
-    typescriptOptions.type     = 'project'
-    typescriptOptions.outFile  = defaults.outFile
-    typescriptOptions.esTarget = defaults.esTarget
-    bundlerOptions.esTarget    = defaults.esTarget
-  } else {
-    const defaults = TypeScriptConfiguration.resolveTargetAndOutFileFromScript(commandOptions.inFile)
-    typescriptOptions.type     = 'script'
-    typescriptOptions.outFile  = defaults.outFile
-    typescriptOptions.esTarget = defaults.esTarget
-    bundlerOptions.esTarget    = defaults.esTarget
-  }
+      // Get 'defaults' from 'inFile | inFileType'
+      if(commandOptions.inFileType === 'project') {
+        const defaults = TypeScriptConfiguration.resolveTargetAndOutFileFromTsConfig(commandOptions.inFile)
+        typescriptOptions.type     = 'project'
+        typescriptOptions.outFile  = defaults.outFile
+        typescriptOptions.esTarget = defaults.esTarget
+        bundlerOptions.esTarget    = defaults.esTarget
+      } else {
+        const defaults = TypeScriptConfiguration.resolveTargetAndOutFileFromScript(commandOptions.inFile)
+        typescriptOptions.type     = 'script'
+        typescriptOptions.outFile  = defaults.outFile
+        typescriptOptions.esTarget = defaults.esTarget
+        bundlerOptions.esTarget    = defaults.esTarget
+      }
 
-  // Set 'outFile' from 'commandOptions'
-  typescriptOptions.inFile = commandOptions.inFile
+      // Set 'outFile' from 'commandOptions'
+      typescriptOptions.inFile = commandOptions.inFile
 
-  // Set 'overrides' from 'commandOptions'
-  if(commandOptions.outFile) {
-    typescriptOptions.outFile = commandOptions.outFile
-  }
-  if(commandOptions.esTarget) {
-    typescriptOptions.esTarget = commandOptions.esTarget
-    bundlerOptions.esTarget = commandOptions.esTarget
-  }
-  if(commandOptions.watch) {
-    typescriptOptions.watch = true
-  }
+      // Set 'overrides' from 'commandOptions'
+      if(commandOptions.outFile) {
+        typescriptOptions.outFile = commandOptions.outFile
+      }
+      if(commandOptions.esTarget) {
+        typescriptOptions.esTarget = commandOptions.esTarget
+        bundlerOptions.esTarget = commandOptions.esTarget
+      }
+      if(commandOptions.watch) {
+        typescriptOptions.watch = true
+      }
 
-  // Set 'bundler' from 'commandOptions'
-  bundlerOptions.projectRoot = commandOptions.projectRoot
-  bundlerOptions.exportAs     = commandOptions.exportAs
-  bundlerOptions.importAs     = commandOptions.importAs
-  bundlerOptions.entryPoint  =  commandOptions.entryPoint
-  bundlerOptions.transforms   = commandOptions.transforms
-  return [typescriptOptions, bundlerOptions]
+      // Set 'bundler' from 'commandOptions'
+      bundlerOptions.projectRoot = commandOptions.projectRoot
+      bundlerOptions.exportAs     = commandOptions.exportAs
+      bundlerOptions.importAs     = commandOptions.importAs
+      bundlerOptions.entryPoint  =  commandOptions.entryPoint
+      bundlerOptions.transforms   = commandOptions.transforms
+      return [typescriptOptions, bundlerOptions]
+    } catch (error) {
+      writeError(error.message)
+      process.exit(1)
+    }
 }
 
 /** Runs the bundler pass. */
@@ -138,7 +143,7 @@ async function bundle(commandOptions: CommandOptions) {
         }
     })
   } catch(error) {
-    fatal(error.message)
+    writeError(error.message)
     process.exit((error as TypeScriptCompilerError).exitcode)
   }
 }
@@ -147,9 +152,9 @@ async function bundle(commandOptions: CommandOptions) {
 async function run(argv: string[]) {
   const commandOptions = Command.parse(argv)
   switch(commandOptions.commandType) {
-    case 'info': return info()
+    case 'info':   return info()
     case 'bundle': return bundle(commandOptions)
-    case 'error': return fatal(commandOptions.errorText!)
+    case 'error':  return writeError(commandOptions.errorText!)
   }
 }
 
