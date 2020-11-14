@@ -4,7 +4,7 @@ typescript-bundle
 
 The MIT License (MIT)
 
-Copyright (c) 2019 Haydn Paterson (sinclair) <haydn.developer@gmail.com>
+Copyright (c) 2019-2020 Haydn Paterson (sinclair) <haydn.developer@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the 'Software'), to deal
@@ -26,17 +26,15 @@ THE SOFTWARE.
 
 ---------------------------------------------------------------------------*/
 
-import { readFileSync } from 'fs'
+import { TsConfig } from '../config/index'
 import { resolve, join, dirname, basename, extname } from 'path'
 
 export type ESTarget = 'unknown' | 'es3' | 'es5' | 'es6' | 'es2015' | 'es2016' | 'es2017' | 'es2018' | 'esnext'
 
 export class TypeScriptConfiguration {
-  
+
   public static read(tsConfigPath: string): any {
-    const content = readFileSync(tsConfigPath, 'utf8')
-    const pass    = JSON.stringify(eval('(' + content + ')')) // strip comments.
-    return JSON.parse(pass)
+    return TsConfig.resolve(tsConfigPath)
   }
 
   public static resolveTargetAndOutFileFromScript(scriptPath: string): { esTarget: ESTarget, outFile: string } {
