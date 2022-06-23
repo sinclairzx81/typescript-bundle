@@ -4,7 +4,7 @@
   "description": " A zero configuration bundling tool for TypeScript.",
   "scripts": {
     "clean": "smoke-task clean",
-    "amd-loaders": "node tasks amd_loaders",
+    "amd-loaders": "smoke-task amd_loaders",
     "build": "smoke-task build",
     "pack": "smoke-task pack",
     "spec": "smoke-task spec",
