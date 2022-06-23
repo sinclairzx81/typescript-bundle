@@ -68,8 +68,8 @@ export async function spec(target = 'target') {
 
 export async function install_cli (target = 'target') {
   await pack(target)
-  const package = JSON.parse(await file(`package.json`).read('utf-8'))
-  const packfile = `typescript-bundle-${package.version}.tgz`
+  const packageJson = JSON.parse(await file(`package.json`).read('utf-8'))
+  const packfile = `typescript-bundle-${packageJson.version}.tgz`
   await shell(`cd ${target}/pack && npm install ${packfile} -g`).exec()
 }
 

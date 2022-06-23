@@ -69,7 +69,7 @@ interface Instance {
 
   const defines: {[name: string]: Define} = {}
 
-  const entry = [null]
+  const entry: (string | null)[] = [null]
 
   function define(name: string, dependencies: string[], factory: Factory) {
 
