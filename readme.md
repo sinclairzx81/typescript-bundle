@@ -288,7 +288,7 @@ The following tasks are provided by this project.
 
 ```bash
 $ npm run clean       # cleans this project.
-$ npm run es_loaders  # rebuilds es loader templates. 
+$ npm run amd-loaders # rebuilds es loader templates. 
 $ npm run build       # builds the bundler.
 $ npm run pack        # packs the bundler.
 $ npm run spec        # builds and runs the spec project.

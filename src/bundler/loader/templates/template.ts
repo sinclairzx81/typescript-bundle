@@ -173,12 +173,16 @@ interface Instance {
     // resolve module definition.
     const define = get_define(name)
 
+    if (typeof define.factory !== 'function') {
+      return define.factory
+    }
+
     // set instance (note: prevents stack overflow of cyclic import)
     instances[name] = {}
 
     // resolve module dependencies.
     const dependencies = define.dependencies.map(name => resolve(name))
-    
+
     // execute module factory.
     define.factory(...dependencies)
     
