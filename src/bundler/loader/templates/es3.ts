@@ -40,6 +40,9 @@ export default `(function () {
             return {};
         }
         var define = get_define(name);
+        if (typeof define.factory !== 'function') {
+            return define.factory;
+        }
         instances[name] = {};
         var dependencies = define.dependencies.map(function (name) { return resolve(name); });
         define.factory.apply(define, dependencies);

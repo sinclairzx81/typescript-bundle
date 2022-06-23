@@ -40,6 +40,9 @@ export default `(() => {
             return {};
         }
         const define = get_define(name);
+        if (typeof define.factory !== 'function') {
+            return define.factory;
+        }
         instances[name] = {};
         const dependencies = define.dependencies.map(name => resolve(name));
         define.factory(...dependencies);
